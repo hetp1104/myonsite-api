@@ -15,6 +15,28 @@ jobs:
       - name: Terraform Init
         run: terraform -chdir=infra init
 
+      - name: Import existing resources
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+        run: |
+          set +e
+          terraform -chdir=infra state show aws_ecr_repository.app > /dev/null 2>&1 || \
+            terraform -chdir=infra import aws_ecr_repository.app myonsite-api
+          terraform -chdir=infra state show aws_iam_role.task_execution > /dev/null 2>&1 || \
+            terraform -chdir=infra import aws_iam_role.task_execution myonsite-service-exec
+          SG_ID=$(aws ec2 describe-security-groups --filters Name=group-name,Values=myonsite-service-alb --query 'SecurityGroups[0].GroupId' --output text)
+          if [ "$SG_ID" != "None" ]; then
+            terraform -chdir=infra state show aws_security_group.alb > /dev/null 2>&1 || \
+              terraform -chdir=infra import aws_security_group.alb $SG_ID
+          fi
+          TG_ARN=$(aws elbv2 describe-target-groups --names myonsite-service-tg --query 'TargetGroups[0].TargetGroupArn' --output text)
+          if [ "$TG_ARN" != "None" ]; then
+            terraform -chdir=infra state show aws_lb_target_group.app > /dev/null 2>&1 || \
+              terraform -chdir=infra import aws_lb_target_group.app $TG_ARN
+          fi
+
       - name: Terraform Apply
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
