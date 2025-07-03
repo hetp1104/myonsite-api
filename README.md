@@ -16,7 +16,7 @@ Before running Terraform, provide IDs for your existing VPC and subnets by setti
 
 - `vpc_id`
 - `public_subnets` (for the load balancer)
-- `private_subnets` (for the ECS service)
+- `private_subnets` (for the ECS service, optional)
 
 Example initialization:
 
@@ -24,8 +24,9 @@ Example initialization:
 terraform -chdir=infra init
 terraform -chdir=infra apply -auto-approve \
   -var="vpc_id=vpc-xxxx" \
-  -var="public_subnets=[\"subnet-a\",\"subnet-b\"]" \
-  -var="private_subnets=[\"subnet-c\",\"subnet-d\"]"
+  -var="public_subnets=[\"subnet-a\",\"subnet-b\"]"
+# Optionally specify private subnets
+# -var="private_subnets=[\"subnet-c\",\"subnet-d\"]"
 ```
 
 The output `alb_dns_name` provides the public endpoint of the service.
@@ -40,9 +41,9 @@ The workflow in `.github/workflows/deploy.yml` automatically builds the Docker i
 - `ECS_CLUSTER` and `ECS_SERVICE` (created by Terraform)
 - `VPC_ID` – ID of your VPC
 - `PUBLIC_SUBNETS` – JSON list of public subnet IDs
-- `PRIVATE_SUBNETS` – JSON list of private subnet IDs
+- `PRIVATE_SUBNETS` – JSON list of private subnet IDs (optional)
 
-The ECS tasks are launched in the specified private subnets without a public IP address.
+If private subnets are provided, the ECS tasks are launched in them without a public IP address. Otherwise the tasks run in the public subnets.
 
 ## Environment Variables
 
@@ -50,12 +51,12 @@ For local development copy `.env.example` to `.env` and adjust values as needed.
 
 ## Troubleshooting
 
-If `terraform apply` fails with errors like `Missing expression` or `No value for required variable`, ensure you supply values for `vpc_id`, `public_subnets`, and `private_subnets`. Example with placeholder IDs:
+If `terraform apply` fails with errors like `Missing expression` or `No value for required variable`, ensure you supply values for `vpc_id` and `public_subnets`. The `private_subnets` variable is optional. Example with placeholder IDs:
 
 ```bash
 terraform -chdir=infra apply -auto-approve \
   -var="vpc_id=vpc-12345678" \
-  -var="public_subnets=[\"subnet-aaaabbbb\"]" \
-  -var="private_subnets=[\"subnet-ccccdddd\"]"
+  -var="public_subnets=[\"subnet-aaaabbbb\"]"
+  # -var="private_subnets=[\"subnet-ccccdddd\"]"
 ```
 

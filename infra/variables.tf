@@ -41,4 +41,5 @@ variable "public_subnets" {
 variable "private_subnets" {
   description = "Private subnets for ECS"
   type        = list(string)
+  default     = []
 }
