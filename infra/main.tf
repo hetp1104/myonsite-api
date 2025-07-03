@@ -15,6 +15,7 @@ locals {
   task_definition = jsondecode(file("${path.module}/task-definition.json"))
 }
 
+# This repository already exists in AWS and is imported via `terraform import`
 resource "aws_ecr_repository" "app" {
   name = var.ecr_repo_name
 }
@@ -33,6 +34,7 @@ data "aws_iam_policy_document" "ecs_task" {
   }
 }
 
+# This IAM role already exists in AWS and is imported via `terraform import`
 resource "aws_iam_role" "task_execution" {
   name               = "${var.service_name}-exec"
   assume_role_policy = data.aws_iam_policy_document.ecs_task.json
@@ -43,6 +45,7 @@ resource "aws_iam_role_policy_attachment" "task_execution" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
+# This security group already exists in AWS and is imported via `terraform import`
 resource "aws_security_group" "alb" {
   name   = "${var.service_name}-alb"
   vpc_id = var.vpc_id
@@ -88,6 +91,7 @@ resource "aws_lb" "app" {
   subnets            = var.public_subnets
 }
 
+# This target group already exists in AWS and is imported via `terraform import`
 resource "aws_lb_target_group" "app" {
   name     = "${var.service_name}-tg"
   port     = 5001
