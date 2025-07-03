@@ -7,82 +7,100 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    
     steps:
-      - uses: actions/checkout@v3
+    - name: Checkout code
+      uses: actions/checkout@v3
 
-      - uses: hashicorp/setup-terraform@v2
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Terraform Init
-        run: terraform -chdir=infra init
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v2
 
-      - name: Import existing resources
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ secrets.AWS_REGION }}
-        run: |
-          set +e
-          terraform -chdir=infra state show aws_ecr_repository.app > /dev/null 2>&1 || \
-            terraform -chdir=infra import aws_ecr_repository.app myonsite-api
-          terraform -chdir=infra state show aws_iam_role.task_execution > /dev/null 2>&1 || \
-            terraform -chdir=infra import aws_iam_role.task_execution myonsite-service-exec
-          SG_ID=$(aws ec2 describe-security-groups --filters Name=group-name,Values=myonsite-service-alb --query 'SecurityGroups[0].GroupId' --output text)
-          if [ "$SG_ID" != "None" ]; then
-            terraform -chdir=infra state show aws_security_group.alb > /dev/null 2>&1 || \
-              terraform -chdir=infra import aws_security_group.alb $SG_ID
+    - name: Terraform Init
+      run: terraform -chdir=infra init
+
+    - name: Import existing resources
+      run: |
+        set +e
+        terraform -chdir=infra state show aws_ecr_repository.app > /dev/null 2>&1 || \
+          terraform -chdir=infra import aws_ecr_repository.app myonsite-api
+        terraform -chdir=infra state show aws_iam_role.task_execution > /dev/null 2>&1 || \
+          terraform -chdir=infra import aws_iam_role.task_execution myonsite-service-exec
+        
+        # Import ALB security group
+        SG_ID=$(aws ec2 describe-security-groups --filters Name=group-name,Values=myonsite-service-alb --query 'SecurityGroups[0].GroupId' --output text)
+        if [ "$SG_ID" != "None" ] && [ -n "$SG_ID" ]; then
+          terraform -chdir=infra state show aws_security_group.alb > /dev/null 2>&1 || \
+            terraform -chdir=infra import aws_security_group.alb $SG_ID
+        fi
+        
+        # Import task security group
+        TASK_SG_ID=$(aws ec2 describe-security-groups --filters Name=group-name,Values=myonsite-service-task --query 'SecurityGroups[0].GroupId' --output text)
+        if [ "$TASK_SG_ID" != "None" ] && [ -n "$TASK_SG_ID" ]; then
+          terraform -chdir=infra state show aws_security_group.task > /dev/null 2>&1 || \
+            terraform -chdir=infra import aws_security_group.task $TASK_SG_ID
+        fi
+        
+        # Import ALB
+        ALB_ARN=$(aws elbv2 describe-load-balancers --names myonsite-service-alb --query 'LoadBalancers[0].LoadBalancerArn' --output text 2>/dev/null || echo "None")
+        if [ "$ALB_ARN" != "None" ] && [ -n "$ALB_ARN" ]; then
+          terraform -chdir=infra state show aws_lb.app > /dev/null 2>&1 || \
+            terraform -chdir=infra import aws_lb.app $ALB_ARN
+        fi
+        
+        # Import target group - try the new name first
+        TG_ARN=$(aws elbv2 describe-target-groups --names myonsite-service-tg-fargate --query 'TargetGroups[0].TargetGroupArn' --output text 2>/dev/null || echo "None")
+        if [ "$TG_ARN" != "None" ] && [ -n "$TG_ARN" ]; then
+          terraform -chdir=infra state show aws_lb_target_group.app > /dev/null 2>&1 || \
+            terraform -chdir=infra import aws_lb_target_group.app $TG_ARN
+        fi
+        
+        # Import listener
+        if [ "$ALB_ARN" != "None" ] && [ -n "$ALB_ARN" ]; then
+          LISTENER_ARN=$(aws elbv2 describe-listeners --load-balancer-arn $ALB_ARN --query 'Listeners[0].ListenerArn' --output text 2>/dev/null || echo "None")
+          if [ "$LISTENER_ARN" != "None" ] && [ -n "$LISTENER_ARN" ]; then
+            terraform -chdir=infra state show aws_lb_listener.http > /dev/null 2>&1 || \
+              terraform -chdir=infra import aws_lb_listener.http $LISTENER_ARN
           fi
-          TG_ARN=$(aws elbv2 describe-target-groups --names myonsite-service-tg --query 'TargetGroups[0].TargetGroupArn' --output text)
-          if [ "$TG_ARN" != "None" ]; then
-            terraform -chdir=infra state show aws_lb_target_group.app > /dev/null 2>&1 || \
-              terraform -chdir=infra import aws_lb_target_group.app $TG_ARN
-          fi
+        fi
+        
+        # Import ECS cluster
+        terraform -chdir=infra state show aws_ecs_cluster.this > /dev/null 2>&1 || \
+          terraform -chdir=infra import aws_ecs_cluster.this myonsite-cluster || true
+        
+        set -e
 
-      - name: Terraform Apply
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_REGION: ${{ secrets.AWS_REGION }}
-          VPC_ID: ${{ secrets.VPC_ID }}
-          PUBLIC_SUBNETS: ${{ secrets.PUBLIC_SUBNETS }}
-          PRIVATE_SUBNETS: ${{ secrets.PRIVATE_SUBNETS }}
-        run: |
-          terraform -chdir=infra apply -auto-approve \
-            -var="vpc_id=$VPC_ID" \
-            -var="public_subnets=$PUBLIC_SUBNETS" \
-            ${PRIVATE_SUBNETS:+-var="private_subnets=$PRIVATE_SUBNETS"}
+    - name: Terraform Apply
+      run: |
+        terraform -chdir=infra apply -auto-approve \
+          -var="vpc_id=${{ secrets.VPC_ID }}" \
+          -var="public_subnets=${{ secrets.PUBLIC_SUBNETS }}" \
+          -var="private_subnets=${{ secrets.PRIVATE_SUBNETS }}"
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Log in to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
+    - name: Build, tag, and push image to Amazon ECR
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:latest
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
 
-      - name: Build, tag, and push image
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          IMAGE_TAG: ${{ github.sha }}
-          ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
-        run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-
-      - name: Render task definition
-        id: render
-        uses: aws-actions/amazon-ecs-render-task-definition@v1
-        with:
-          task-definition: infra/task-definition.json
-          container-name: app
-          image: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY }}:${{ github.sha }}
-
-      - name: Deploy to ECS
-        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-        with:
-          task-definition: ${{ steps.render.outputs.task-definition }}
-          service: ${{ secrets.ECS_SERVICE }}
-          cluster: ${{ secrets.ECS_CLUSTER }}
-          wait-for-service-stability: true
+    - name: Update ECS service
+      run: |
+        aws ecs update-service \
+          --cluster ${{ secrets.ECS_CLUSTER }} \
+          --service ${{ secrets.ECS_SERVICE }} \
+          --force-new-deployment
