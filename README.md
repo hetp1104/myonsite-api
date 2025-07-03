@@ -48,3 +48,14 @@ The ECS tasks are launched in the specified private subnets without a public IP 
 
 For local development copy `.env.example` to `.env` and adjust values as needed. The Dockerfile uses these variables when running locally with `docker-compose`. In production the values are defined directly in `infra/task-definition.json` and can be modified or replaced with AWS Secrets Manager entries if desired.
 
+## Troubleshooting
+
+If `terraform apply` fails with errors like `Missing expression` or `No value for required variable`, ensure you supply values for `vpc_id`, `public_subnets`, and `private_subnets`. Example with placeholder IDs:
+
+```bash
+terraform -chdir=infra apply -auto-approve \
+  -var="vpc_id=vpc-12345678" \
+  -var="public_subnets=[\"subnet-aaaabbbb\"]" \
+  -var="private_subnets=[\"subnet-ccccdddd\"]"
+```
+
