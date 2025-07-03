@@ -49,6 +49,17 @@ If private subnets are provided, the ECS tasks are launched in them without a pu
 
 For local development copy `.env.example` to `.env` and adjust values as needed. The Dockerfile uses these variables when running locally with `docker-compose`. In production the values are defined directly in `infra/task-definition.json` and can be modified or replaced with AWS Secrets Manager entries if desired.
 
+## Running Locally
+
+Install dependencies and start the server with:
+
+```bash
+npm install
+npm start
+```
+
+The application listens on port `5001` by default and will reload automatically when run via Docker or when using tools like `nodemon`.
+
 ## Troubleshooting
 
 If `terraform apply` fails with errors like `Missing expression` or `No value for required variable`, ensure you supply values for `vpc_id` and `public_subnets`. The `private_subnets` variable is optional. Example with placeholder IDs:
