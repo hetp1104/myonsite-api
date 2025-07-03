@@ -12,6 +12,8 @@ The Terraform files in `infra/` create the following resources:
 - IAM roles and security groups
 - Auto scaling policy based on CPU utilization
 
+Before running Terraform, provide IDs for your existing VPC and subnets by setting the following variables. You can copy `infra/terraform.tfvars.example` to `infra/terraform.tfvars` and edit the values:
+=======
 Before running Terraform, provide IDs for your existing VPC and subnets by setting the following variables:
 
 - `vpc_id`
@@ -38,6 +40,9 @@ The workflow in `.github/workflows/deploy.yml` automatically builds the Docker i
 - `AWS_REGION`
 - `ECR_REPOSITORY` (name of the repository created by Terraform)
 - `ECS_CLUSTER` and `ECS_SERVICE` (created by Terraform)
+- `VPC_ID` – ID of your VPC
+- `PUBLIC_SUBNETS` – JSON list of public subnet IDs
+- `PRIVATE_SUBNETS` – JSON list of private subnet IDs
 
 ## Environment Variables
 
