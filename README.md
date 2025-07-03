@@ -31,23 +31,6 @@ terraform -chdir=infra apply -auto-approve \
 
 The output `alb_dns_name` provides the public endpoint of the service.
 
-### Terraform State Backend
-
-Terraform state is stored remotely in an S3 bucket so it can be shared across
-developers and CI runs. Ensure your AWS credentials are configured and run
-`terraform init` to connect to the backend. Avoid manually deleting state files.
-
-To create the backend if it does not already exist:
-
-```bash
-aws s3api create-bucket --bucket myonsite-terraform-state --region us-east-1
-aws dynamodb create-table \
-  --table-name terraform-locks \
-  --attribute-definitions AttributeName=LockID,AttributeType=S \
-  --key-schema AttributeName=LockID,KeyType=HASH \
-  --billing-mode PAY_PER_REQUEST
-```
-
 ## GitHub Actions Deployment
 
 The workflow in `.github/workflows/deploy.yml` automatically builds the Docker image, pushes it to ECR and updates the ECS service when changes are pushed to the `main` branch. Configure the following secrets in your GitHub repository:
