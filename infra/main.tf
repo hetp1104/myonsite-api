@@ -11,6 +11,10 @@ provider "aws" {
   region = var.aws_region
 }
 
+locals {
+  task_definition = jsondecode(file("${path.module}/task-definition.json"))
+}
+
 resource "aws_ecr_repository" "app" {
   name = var.ecr_repo_name
 }
@@ -113,20 +117,20 @@ resource "aws_ecs_task_definition" "app" {
   cpu                      = "256"
   memory                   = "512"
 
-  container_definitions = file("${path.module}/task-definition.json")
+  container_definitions = jsonencode(local.task_definition.containerDefinitions)
 }
 
 resource "aws_ecs_service" "app" {
-  name            = var.service_name
-  cluster         = aws_ecs_cluster.this.id
-  task_definition = aws_ecs_task_definition.app.arn
-  desired_count   = var.desired_count
-  launch_type     = "FARGATE"
+  name                              = var.service_name
+  cluster                           = aws_ecs_cluster.this.id
+  task_definition                   = aws_ecs_task_definition.app.arn
+  desired_count                     = var.desired_count
+  launch_type                       = "FARGATE"
   health_check_grace_period_seconds = 0
 
   network_configuration {
-    subnets         = length(var.private_subnets) > 0 ? var.private_subnets : var.public_subnets
-    security_groups = [aws_security_group.task.id]
+    subnets          = length(var.private_subnets) > 0 ? var.private_subnets : var.public_subnets
+    security_groups  = [aws_security_group.task.id]
     assign_public_ip = false
   }
 
@@ -155,7 +159,7 @@ resource "aws_appautoscaling_policy" "cpu" {
   service_namespace  = aws_appautoscaling_target.ecs.service_namespace
 
   target_tracking_scaling_policy_configuration {
-    target_value       = 50
+    target_value = 50
     predefined_metric_specification {
       predefined_metric_type = "ECSServiceAverageCPUUtilization"
     }
