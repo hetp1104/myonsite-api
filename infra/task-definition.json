@@ -1,0 +1,25 @@
+{
+  "family": "myonsite-service",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "256",
+  "memory": "512",
+  "containerDefinitions": [
+    {
+      "name": "app",
+      "image": "app:latest",
+      "portMappings": [
+        {
+          "containerPort": 5001,
+          "protocol": "tcp"
+        }
+      ],
+      "environment": [
+        {"name": "NODE_ENV", "value": "production"},
+        {"name": "PORT", "value": "5001"},
+        {"name": "REDIS_HOST", "value": "redis"},
+        {"name": "REDIS_PORT", "value": "6379"}
+      ]
+    }
+  ]
+}
