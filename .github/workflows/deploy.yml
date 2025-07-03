@@ -27,7 +27,7 @@ jobs:
           terraform -chdir=infra apply -auto-approve \
             -var="vpc_id=$VPC_ID" \
             -var="public_subnets=$PUBLIC_SUBNETS" \
-            -var="private_subnets=$PRIVATE_SUBNETS"
+            ${PRIVATE_SUBNETS:+-var="private_subnets=$PRIVATE_SUBNETS"}
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4

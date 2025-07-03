@@ -125,7 +125,7 @@ resource "aws_ecs_service" "app" {
   health_check_grace_period_seconds = 0
 
   network_configuration {
-    subnets         = var.private_subnets
+    subnets         = length(var.private_subnets) > 0 ? var.private_subnets : var.public_subnets
     security_groups = [aws_security_group.task.id]
     assign_public_ip = false
   }
