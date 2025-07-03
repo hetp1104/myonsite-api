@@ -13,6 +13,8 @@ The Terraform files in `infra/` create the following resources:
 - Auto scaling policy based on CPU utilization
 
 Before running Terraform, provide IDs for your existing VPC and subnets by setting the following variables. You can copy `infra/terraform.tfvars.example` to `infra/terraform.tfvars` and edit the values:
+=======
+Before running Terraform, provide IDs for your existing VPC and subnets by setting the following variables:
 
 - `vpc_id`
 - `public_subnets` (for the load balancer)
