@@ -77,11 +77,7 @@ jobs:
         set -e
 
     - name: Terraform Apply
-      run: |
-        terraform -chdir=infra apply -auto-approve \
-          -var="vpc_id=${{ secrets.VPC_ID }}" \
-          -var="public_subnets=${{ secrets.PUBLIC_SUBNETS }}" \
-          -var="private_subnets=${{ secrets.PRIVATE_SUBNETS }}"
+      run: terraform -chdir=infra apply -auto-approve
 
     - name: Login to Amazon ECR
       id: login-ecr
