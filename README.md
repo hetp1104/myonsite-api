@@ -68,9 +68,7 @@ If resources like the ECR repository or IAM roles were created outside of Terraf
 ```bash
 terraform -chdir=infra import aws_ecr_repository.app myonsite-api
 terraform -chdir=infra import aws_iam_role.task_execution myonsite-service-exec
-# Import the ALB security group and target group if they already exist
-terraform -chdir=infra import aws_security_group.alb sg-xxxxxxxx
-terraform -chdir=infra import aws_lb_target_group.app arn:aws:elasticloadbalancing:region:acct:targetgroup/myonsite-service-tg/1234567890abcdef
+
 ```
 
 After the import completes, run `terraform plan` to review any changes and then `terraform apply`.
