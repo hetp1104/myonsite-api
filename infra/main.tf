@@ -11,6 +11,10 @@ provider "aws" {
   region = var.aws_region
 }
 
+locals {
+  task_definition = jsondecode(file("${path.module}/task-definition.json"))
+}
+
 resource "aws_ecr_repository" "app" {
   name = var.ecr_repo_name
 }
@@ -113,7 +117,7 @@ resource "aws_ecs_task_definition" "app" {
   cpu                      = "256"
   memory                   = "512"
 
-  container_definitions = file("${path.module}/task-definition.json")
+  container_definitions = jsonencode(local.task_definition.containerDefinitions)
 }
 
 resource "aws_ecs_service" "app" {
