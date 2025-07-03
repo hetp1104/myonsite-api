@@ -68,6 +68,7 @@ If resources like the ECR repository or IAM roles were created outside of Terraf
 ```bash
 terraform -chdir=infra import aws_ecr_repository.app myonsite-api
 terraform -chdir=infra import aws_iam_role.task_execution myonsite-service-exec
+
 ```
 
 After the import completes, run `terraform plan` to review any changes and then `terraform apply`.
