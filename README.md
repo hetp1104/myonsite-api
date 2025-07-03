@@ -68,6 +68,10 @@ If resources like the ECR repository or IAM roles were created outside of Terraf
 ```bash
 terraform -chdir=infra import aws_ecr_repository.app myonsite-api
 terraform -chdir=infra import aws_iam_role.task_execution myonsite-service-exec
+# replace sg-xxxxxxxx with your existing ALB security group ID
+terraform -chdir=infra import aws_security_group.alb sg-xxxxxxxx
+# replace REGION, ACCOUNT_ID and ID with values from the existing target group ARN
+terraform -chdir=infra import aws_lb_target_group.app arn:aws:elasticloadbalancing:REGION:ACCOUNT_ID:targetgroup/myonsite-service-tg/ID
 
 ```
 
