@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <!-- META SECTION -->
+        <title>
+            MyOnSite
+        </title>
+        <!-- FORM VALIDATION -->
+        <!-- START TEMPLATE -->
+        <script type="text/javascript" src="js/plugins/jquery/jquery.min.js"></script>
+        <script type="text/javascript" src="js/plugins/bootstrap/bootstrap.min.js"></script>
+        <script type='text/javascript' src='js/plugins/icheck/icheck.min.js'></script>
+        <script type="text/javascript" src="js/plugins/mcustomscrollbar/jquery.mCustomScrollbar.min.js"></script>
+        <script type="text/javascript" src="js/actions.js"></script>
+
+        <script type='text/css' src='js/clock-picker/bootstrap-clockpicker.min.css'></script>
+        <script type='text/javascript' src='js/clock-picker/bootstrap-clockpicker.min.js'></script>
+        <script type='text/javascript' src='js/img-zoom.js'></script>
+        <script type='text/css' src='css/img-zoom.css'></script>
+
+        <script type="text/javascript">
+
+            
+                
+                function rejectDoc(vehicalDocId){
+                    alert("Rej : "+vehicalDocId)
+                }
+                
+                function approveDoc(vehicalDocId){
+                    alert("Approve : "+vehicalDocId)
+                } 
+                
+
+            $(document).ready(function () {
+                var path = window.location.pathname;
+                var value = path.split('/');
+               
+                $('#' + value[1]).addClass('active');
+                var page_title = $('#' + value[1]).text();
+                $('#page_title').text(page_title);
+                $('#' + value[1]).parent().parent().addClass("active");
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/session_data',
+                    data: {'type': 'admin'},
+                    dataType: "json",
+                    success: function (response) {
+                        if(response.success){
+                            $('option[value=' + response.cookies + ']').attr('selected',true);
+                            if (response.session_data.type == 1) {
+                                var index = response.session_data.url_array.indexOf(value[1]);
+                                if (index == -1 && value[1] != 'dashboard') {
+                                    window.location.href = 'dashboard';
+                                }
+
+                                if (response.session_data.url_array.indexOf('today_requests') == -1) {
+                                    $('#today_requests').hide();
+                                }
+
+                                if (response.session_data.url_array.indexOf('requests') == -1) {
+                                    $('#requests').hide();
+                                }
+                                if (response.session_data.url_array.indexOf('schedules') == -1) {
+                                    $('#schedules').hide();
+                                }
+                                if (response.session_data.url_array.indexOf('reviews') == -1) {
+                                    $('#reviews').hide();
+                                }
+                                if (response.session_data.url_array.indexOf('cancelation_reasons') == -1) {
+                                    $('#cancelation_reasons').hide();
+                                }
+
+                                if (response.session_data.url_array.indexOf('mapview') == -1) {
+                                    $('#mapview').hide();
+                                }
+                                if (response.session_data.url_array.indexOf('provider_track') == -1) {
+                                    $('#provider_track').hide();
+                                }
+                                if (response.session_data.url_array.indexOf('all_city') == -1) {
+                                    $('#all_city').hide();
+                                }
+                                if (response.session_data.url_array.indexOf('all_city') == -1 && response.session_data.url_array.indexOf('provider_track') == -1 && response.session_data.url_array.indexOf('mapview') == -1) {
+                                    $('#map_menu').hide();
+                                }
+
+
+                                if (response.session_data.url_array.indexOf('online_providers') == -1) {
+                                    $('#online_providers').hide();
+                                }
+                                if (response.session_data.url_array.indexOf('approved_providers') == -1) {
+                                    $('#approved_providers').hide();
+                                }
+                                if (response.session_data.url_array.indexOf('pending_for_approvel') == -1) {
+                                    $('#pending_for_approvel').hide();
+                                }
+                                if (response.session_data.url_array.indexOf('pending_for_approvel') == -1 && response.session_data.url_array.indexOf('online_providers') == -1 && response.session_data.url_array.indexOf('approved_providers') == -1) {
+                                    $('#provider_menu').hide();
+                                }
+
+                                if (response.session_data.url_array.indexOf('users') == -1) {
+                                    $('#users').hide();
+                                }
+                                if (response.session_data.url_array.indexOf('declined_users') == -1) {
+                                    $('#declined_users').hide();
+                                }
+                                if (response.session_data.url_array.indexOf('users') == -1 && response.session_data.url_array.indexOf('declined_users') == -1) {
+                                    $('#user_menu').hide();
+                                }
+
+
+//temperature data
+//For dropdown menu on leftside for page selection
+// Date:09/15/2022
+
+                                if (response.session_data.url_array.indexOf('assets') == -1) {
+                                    $('#assets').hide();
+                                }
+                                if (response.session_data.url_array.indexOf('assetreadings') == -1) {
+                                    $('#assetreadings').hide();
+                                }
+                                // if (response.session_data.url_array.indexOf('equipments') == -1 && response.session_data.url_array.indexOf('assetreadings') == -1) {
+                                //     $('#equipment_menu').hide();
+                                // }
+                                // if (response.session_data.url_array.indexOf('equipments') == -1 && response.session_data.url_array.indexOf('assets') == -1) {
+                                //     $('#equipment_menu').hide();
+                                // }
+//temperature data
+
+                                if (response.session_data.url_array.indexOf('dispatcher') == -1) {
+                                    $('#dispatcher_menu').hide();
+                                }
+                                if (response.session_data.url_array.indexOf('corporate') == -1) {
+                                    $('#corporate_menu').hide();
+                                }
+                                if (response.session_data.url_array.indexOf('hotel') == -1) {
+                                    $('#hotel_menu').hide();
+                                }
+                                if (response.session_data.url_array.indexOf('partners') == -1) {
+                                    $('#partner_menu').hide();
+                                }
+
+                                if (response.session_data.url_array.indexOf('service_types') == -1) {
+                                    $('#service_types').hide();
+                                }
+                                if (response.session_data.url_array.indexOf('country') == -1) {
+                                    $('#country').hide();
+                                }
+                                if (response.session_data.url_array.indexOf('city') == -1) {
+                                    $('#city').hide();
+                                }
+
+
+
+                                if (response.session_data.url_array.indexOf('city_type') == -1) {
+                                    $('#city_type').hide();
+                                }
+                                if (response.session_data.url_array.indexOf('all_city') == -1 && response.session_data.url_array.indexOf('service_types') == -1 && response.session_data.url_array.indexOf('country') == -1 && response.session_data.url_array.indexOf('city') == -1 && response.session_data.url_array.indexOf('city_type') == -1) {
+                                    $('#type_menu').hide();
+                                }
+                                
+                                if (response.session_data.url_array.indexOf('trip_earning') == -1) {
+                                    $('#trip_earning').hide();
+                                }
+                                if (response.session_data.url_array.indexOf('daily_earning') == -1) {
+                                    $('#daily_earning').hide();
+                                }
+                                if (response.session_data.url_array.indexOf('weekly_earning') == -1) {
+                                    $('#weekly_earning').hide();
+                                }
+
+                                if (response.session_data.url_array.indexOf('admin_partner_weekly_earning') == -1) {
+                                    $('#admin_partner_weekly_earning').hide();
+                                }
+
+                                if (response.session_data.url_array.indexOf('wallet_history') == -1) {
+                                    $('#wallet_history').hide();
+                                }
+                                 if (response.session_data.url_array.indexOf('transaction_history') == -1) {
+                                    $('#transaction_history').hide();
+                                }
+
+                                if (response.session_data.url_array.indexOf('transaction_history') == -1 && response.session_data.url_array.indexOf('trip_earning') == -1 && response.session_data.url_array.indexOf('daily_earning') == -1 && response.session_data.url_array.indexOf('weekly_earning') == -1 && response.session_data.url_array.indexOf('admin_partner_weekly_earning') == -1 && response.session_data.url_array.indexOf('wallet_history') == -1) {
+                                    $('#trip_earning_menu').hide();
+                                }
+                            
+
+                                if (response.session_data.url_array.indexOf('languages') == -1) {
+                                    $('#languages').hide();
+                                }
+
+                                if (response.session_data.url_array.indexOf('promotions') == -1) {
+                                    $('#promotions').hide();
+                                }
+                                if (response.session_data.url_array.indexOf('documents') == -1) {
+                                    $('#documents').hide();
+                                }
+                                if (response.session_data.url_array.indexOf('email') == -1) {
+                                    $('#email').hide();
+                                }
+                                if (response.session_data.url_array.indexOf('sms') == -1) {
+                                    $('#sms').hide();
+                                }
+                                if (response.session_data.url_array.indexOf('admin_list') == -1) {
+                                    $('#admin_list').hide();
+                                }
+                                if (response.session_data.url_array.indexOf('terms_and_privacy_setting') == -1) {
+                                    $('#terms_and_privacy_setting').hide();
+                                }
+                                if (response.session_data.url_array.indexOf('settings') == -1) {
+                                    $('#settings').hide();
+                                }
+                                if (response.session_data.url_array.indexOf('installation_settings') == -1) {
+                                    $('#installation_settings').hide();
+                                }
+                                if (response.session_data.url_array.indexOf('languages') == -1 && response.session_data.url_array.indexOf('promotions') == -1 && response.session_data.url_array.indexOf('documents') == -1 && response.session_data.url_array.indexOf('email') == -1 && response.session_data.url_array.indexOf('sms') == -1 && response.session_data.url_array.indexOf('terms_and_privacy_setting') == -1 && response.session_data.url_array.indexOf('admin_list') == -1 && response.session_data.url_array.indexOf('settings') == -1 && response.session_data.url_array.indexOf('installation_settings') == -1) {
+                                    $('#setting_menu').hide();
+                                }
+
+                                if (response.session_data.url_array.indexOf('send_mass_notification') == -1) {
+                                    $('#send_mass_notification_menu').hide();
+                                }
+
+
+                            }
+                        } else {
+                            window.location = 'payment_pending'
+                        }
+                    }
+                });
+
+                $('#dispatcher_menu').click(function () {
+                    window.location.href = $('#dispatchers').attr('href');
+
+                })
+                $('#corporate_menu').click(function () {
+                    window.location.href = $('#corporates').attr('href');
+
+                })
+
+                $('#hotel_menu').click(function () {
+
+                    window.location.href = $('#hotels').attr('href');
+
+                })
+
+
+                $('#partner_menu').click(function () {
+                    window.location.href = $('#partner').attr('href');
+
+                })
+
+                $('.day').click(function () {
+                    alert("day")
+                })
+
+                if($('.image-popup-vertical-fit')){
+                    $('.image-popup-vertical-fit').magnificPopup({
+                        type: 'image',
+                        closeOnContentClick: false,
+                        mainClass: 'mfp-img-mobile',
+                        image: {
+                            verticalFit: true,
+                            titleSrc: function(item) {
+
+
+                                return '<form method="post" action="/approve_provider_document"><input type="hidden" name="id" value="'+item.el.attr('data-id')+'" /><button type="submit" class="btn btn-default" style="width:100%;">'+item.el.attr('data-approve')+'</button></form> &nbsp;  <form method="post" action="/reject_provider_document"><input type="hidden" name="id" value="'+item.el.attr('data-id')+'" /><button type="submit" class="btn btn-default" style="width:100%;">'+item.el.attr('data-reject')+'</button></form>';
+                            
+                            
+                                // return item.el.attr('title') + ' &middot; <a class="image-source-link" onclick="approveDoc(\''+item.el.attr('data-id')+'\');" href="#"> Approve </a> &middot; <a class="image-source-link" onclick="rejectDoc(\''+item.el.attr('data-id')+'\');" href="#"> Reject </a>';
+                            }
+                        },
+                        gallery: {
+                            enabled: true
+                        },                       
+                    });
+                        
+
+                }
+
+                if($('.image-popup-vertical-fit-vehical')){
+                    $('.image-popup-vertical-fit-vehical').magnificPopup({
+                        type: 'image',
+                        closeOnContentClick: false,
+                        mainClass: 'mfp-img-mobile',
+                        image: {
+                            verticalFit: true,
+                            titleSrc: function(item) {
+
+                                return item.el.attr('title');
+                                // return '<form method="post" action="/approve_provider_document"><input type="hidden" name="id" value="'+item.el.attr('data-id')+'" /><button type="submit" class="btn btn-default" style="width:100%;">'+item.el.attr('data-approve')+'</button></form> &nbsp;  <form method="post" action="/reject_provider_document"><input type="hidden" name="id" value="'+item.el.attr('data-id')+'" /><button type="submit" class="btn btn-default" style="width:100%;">'+item.el.attr('data-reject')+'</button></form>';
+                            
+                            
+                                // return item.el.attr('title') + ' &middot; <a class="image-source-link" onclick="approveDoc(\''+item.el.attr('data-id')+'\');" href="#"> Approve </a> &middot; <a class="image-source-link" onclick="rejectDoc(\''+item.el.attr('data-id')+'\');" href="#"> Reject </a>';
+                            }
+                        },
+                        gallery: {
+                            enabled: true
+                        },                       
+                    });
+                        
+
+                }
+                
+            });
+       
+       </script>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+        <link rel="icon" href="web_images/title_image.png" type="image/x-icon" />
+        <!-- END META SECTION -->
+
+        <!-- CSS INCLUDE -->
+        <link rel="stylesheet" type="text/css" href="css/theme-default.css" />
+        <link rel="stylesheet" type="text/css" href="css/map.css" />
+        <!-- EOF CSS INCLUDE -->
+
+        <script type="text/javascript">
+            function sort(ascending, columnClassName, tableId) {
+                var tbody = document.getElementById(tableId).getElementsByTagName(
+                        "tbody")[0];
+                var rows = tbody.getElementsByTagName("tr");
+          
+                var unsorted = true;
+          
+                while (unsorted) {
+                    unsorted = false
+          
+                    for (var r = 0; r < rows.length - 1; r++) {
+                        var row = rows[r];
+                        var nextRow = rows[r + 1];
+          
+                        var value = row.getElementsByClassName(columnClassName)[0].innerHTML;
+                        var nextValue = nextRow.getElementsByClassName(columnClassName)[0].innerHTML;
+          
+                        value = value.replace(',', '.'); // in case a comma is used in float number
+                        nextValue = nextValue.replace(',', '.');
+          
+                        if (!isNaN(value)) {
+                            value = parseFloat(value);
+                            nextValue = parseFloat(nextValue);
+                        }
+          
+                        if (ascending ? value > nextValue : value < nextValue) {
+                            tbody.insertBefore(nextRow, row);
+                            unsorted = true;
+                        }
+                    }
+                }
+            };
+          </script>
+
+    </head>
+
+    <body>
+        <!-- START PAGE CONTAINER -->
+        <div class="page-container">
+            <!-- START PAGE SIDEBAR -->
+            <div class="page-sidebar">
+                <!-- START X-NAVIGATION -->
+                <ul class="x-navigation">
+                    <li>
+
+                        <a style="text-align: center;">
+                            
+                        </a>
+                        <a href="#" class="x-navigation-control"></a>
+                    </li>
+                    <li class="xn-profile">
+
+                        <div class="profile">
+                            <div>
+                            <div class="profile-image">
+                                <img src="web_images/logo.png" style="border:none" alt="MyOnSite" />
+                            </div>
+                            </div>
+                            <div class="profile-data">
+                                <div class="profile-data-name"></div>
+
+                            </div>
+
+                        </div>
+
+                    </li>
+                    
+                    <li>
+                        <a style="text-align: center;">
+                            Staging 1.4.1
+                        </a>
+                    </li>
+                    <ul id="menu-item">
+
+                        <li class="xn-openable deactive" id="dashboard_menu">
+                            <a href="/dashboard"><span class="fa fa-bar-chart-o"></span> <span class="xn-text">Dashboard</span></a>
+                            <ul>
+                                <li id="dashboard"><a href="/dashboard" id="home"><span class="fa fa-dashboard"></span> <span class="xn-text">Dashboard</span></a></li>
+                                <li id="today_requests"><a href="/today_requests"><span class="glyphicon glyphicon-send"></span> <span class="xn-text">Today&#39;s Requests</span></a></li>
+                                <li id="requests"><a href="/requests"><span class="fa fa-calendar"></span> <span class="xn-text">Completed Requests</span></a></li>
+                                <li id="schedules"><a href="/schedules"><span class="fa fa-calendar-o"></span> <span class="xn-text">Scheduled Requests</span></a></li>
+                                <!-- <li id="schedules"><span class="fa fa-calendar-o"></span> <span class="xn-text">Scheduled Requests</span></li> -->
+                                <li id="all_requests"><a href="/all_requests"><span class="fa fa-calendar"></span> <span class="xn-text">All Requests</span></a></li>
+                                <li id="reviews"><a href="/reviews"><span class="fa fa-thumbs-up"></span> <span class="xn-text">Reviews</span></a></li>
+                                <li id="cancelation_reasons"><a href="/cancelation_reasons"><span class="fa fa-tasks"></span> <span class="xn-text">Cancellation Reason</span></a></li>
+
+
+
+                            </ul>
+                        </li>
+
+                        <li class="xn-openable deactive" id="map_menu">
+                            <a href="/mapview"><span class="glyphicon glyphicon-send fa fa-map-marker"></span> <span class="xn-text">Map View</span></a>
+                            <ul>
+                                <li id="mapview"><a href="/mapview"><span class="fa fa-map-marker"></span> <span class="xn-text">Providers Map View</span></a></li>
+                                <li id="provider_track"><a href="/provider_track"><span class="fa fa-map-marker"></span> <span class="xn-text">Provider Tracking</span></a></li>
+                                <li id="all_city"><a href="/all_city"><span class="fa fa-road"></span> <span class="xn-text ">All Cities</span></a></li>                                   
+
+                            </ul>
+                        </li>
+
+                        <li class="xn-openable deactive" id="provider_menu">
+                            <a href="#"><span class="fa fa-users"></span> <span class="xn-text">Service Providers</span></a>
+                            <ul>
+                                <li id="online_providers"><a href="/online_providers"><span class="fa fa-hand-o-right"></span> <span class="xn-text">Online Providers</span></a></li>
+                                <li id="approved_providers"><a href="/approved_providers"><span class="fa fa-check"></span> <span class="xn-text">Approved Providers</span></a></li>
+                                <li id="pending_for_approvel"><a href="/pending_for_approvel"><span class="fa fa-exclamation-triangle"></span> <span class="xn-text">Unapproved Providers</span></a></li>
+                            </ul>
+                        </li>
+
+                        <li class="xn-openable deactive" id="user_menu">
+                            <a href="#"><span class="fa fa-users"></span> <span class="xn-text">Users</span></a>
+                            <ul>
+                                <li id="users"><a href="/users"><span class="glyphicon glyphicon-user"></span> <span class="xn-text">Users</span></a></li>
+                                <li id="declined_users"><a href="/declined_users"><span class="fa fa-meh-o"></span> <span class="xn-text">Blocked Users</span></a></li>
+
+                            </ul>
+                        </li>
+                        
+
+
+<!-- //For dropdown menu on leftside for page selection -->
+<!-- Date:09/15/2022 -->
+                        <li class="xn-openable deactive" id="equipment_menu">
+                            <a href="#"><span class="fa fa-users"></span> <span class="xn-text">Equipments</span></a>
+                            <ul>
+                                <li id="assets"><a href="/assets"><span class="glyphicon glyphicon-user"></span> <span class="xn-text">Assets</span></a></li>
+                                <li id="assetreadings"><a href="/assetreadings"><span class="fa fa-meh-o"></span> <span class="xn-text">Asset Readings</span></a></li>
+
+                            </ul>
+                        </li>
+                    
+
+                        <li class="xn-openable deactive" id="dispatcher_menu">
+                            <a href="/dispatcher"><span class="fa fa-user"></span> <span class="xn-text">Dispatchers</span></a>
+                            <ul>
+                                <li id="dispatcher" style="display: none;"><a href="/dispatcher" id="dispatchers"><span class="fa fa-user"></span> <span class="xn-text">Dispatchers</span></a></li>
+
+
+                            </ul>
+                        </li>
+                        <li class="xn-openable deactive" id="corporate_menu">
+                            <a href="/corporate"><span class="fa fa-user"></span> <span class="xn-text">Corporate</span></a>
+                            <ul>
+                                <li id="corporate" style="display: none;"><a href="/corporate" id="corporates"><span class="fa fa-user"></span> <span class="xn-text">Corporate</span></a></li>
+
+
+                            </ul>
+                        </li>
+
+                        <li class="xn-openable deactive" id="hotel_menu">
+                            <a href="/hotel"><span class="fa fa-user"></span> <span class="xn-text">Hotels</span></a>
+                            <ul>
+                                <li id="hotel" style="display: none;"><a href="/hotel" id="hotels"><span class="fa fa-user"></span> <span class="xn-text">Hotels</span></a></li>
+
+                            </ul>
+                        </li>
+
+
+                        <li class="xn-openable deactive" id="partner_menu">
+                            <a href="/partners"><span class="fa fa-users"></span> <span class="xn-text">Partners</span></a>
+                            <ul>
+                                <li id="partners" style="display: none;"><a href="/partners" id="partner"><span class="fa fa-users"></span> <span class="xn-text">Partners</span></a></li>
+
+                            </ul>
+                        </li>
+
+
+                        <li class="xn-openable deactive " id="type_menu">
+                            <a href="# "><span class="fa fa-dashboard "></span> <span class="xn-text ">Service Types</span></a>
+                            <ul>
+                                <li id="service_types"><a href="/service_types"><span class="fa fa-truck
+                                                                                      "></span> <span class="xn-text">Type</span></a></li>
+                                <li id="country"><a href="/country"><span class="fa fa-globe
+                                                                          "></span> <span class="xn-text ">Country</span></a></li>
+                                <li id="city"><a href="/city"><span class="fa fa-road
+                                                                    "></span> <span class="xn-text ">City</span></a></li>
+
+
+                                <li id="city_type"><a href="/city_type"><span class="fa fa-tasks
+                                                                              "></span> <span class="xn-text ">Type And City Association</span></a></li>
+                            </ul>
+                        </li>
+
+
+
+
+                        <li class="xn-openable deactive" id="trip_earning_menu">
+                            <a href="/admin"><span class="fa fa-dollar"></span> <span class="xn-text">Trip Payment</span></a>
+                            <ul>
+                                <li id="trip_earning">
+                                    <a style="background: #273541"><form method="post" action="/trip_earning">
+                                            <input type="hidden" name="type" value="admin" />
+                                            <button type="submit" class="btn btn-default" style="border-color: #273541; background-color: #273541; text-align: left; color: white; width: 100%;"><span class="fa fa-dollar"></span> <span class="xn-text">Trip Earnings</span></button>
+                                        </form></a>
+                                </li>
+
+
+                                <li id="daily_earning">
+                                    <a style="background: #273541"><form method="post" action="/daily_earning">
+                                            <input type="hidden" name="type" value="admin" />
+                                            <button type="submit" class="btn btn-default" style="border-color: #273541; background-color: #273541; text-align: left; color: white; width: 100%;"><span class="fa fa-dollar"></span> <span class="xn-text">Daily Earning</span></button>
+                                        </form></a>
+                                </li>
+
+                                <li id="weekly_earning">
+                                    <a style="background: #273541"><form method="post" action="/weekly_earning">
+                                            <input type="hidden" name="type" value="admin" />
+                                            <button type="submit" class="btn btn-default" style="border-color: #273541; background-color: #273541; text-align: left; color: white; width: 100%;"><span class="fa fa-dollar"></span> <span class="xn-text">Weekly Earning</span></button>
+                                        </form></a>
+                                </li>
+
+                                <li id="admin_partner_weekly_earning">
+                                    <a style="background: #273541"><form method="post" action="/admin_partner_weekly_earning">
+                                            <input type="hidden" name="type" value="admin" />
+                                            <button type="submit" class="btn btn-default" style="border-color: #273541; background-color: #273541; text-align: left; color: white; width: 100%;"><span class="fa fa-dollar"></span> <span class="xn-text">Partner Weekly Payments</span></button>
+                                        </form></a>
+                                </li>
+
+                                <li id="wallet_history">
+                                    <a style="background: #273541"><form method="post" action="/wallet_history">
+                                            <input type="hidden" name="type" value="admin" />
+                                            <button type="submit" class="btn btn-default" style="border-color: #273541; background-color: #273541; text-align: left; color: white; width: 100%;"><span class="fa fa-dollar"></span> <span class="xn-text">Wallet History</span></button>
+                                        </form></a>
+                                </li>
+                                
+                                 <li id="transaction_history">
+                                    <a style="background: #273541"><form method="post" action="/transaction_history">
+                                            <input type="hidden" name="type" value="admin" />
+                                            <button type="submit" class="btn btn-default" style="border-color: #273541; background-color: #273541; text-align: left; color: white; width: 100%;"><span class="fa fa-dollar"></span> <span class="xn-text">Transaction History</span></button>
+                                        </form></a>
+                                </li>
+
+
+
+                            </ul>
+                        </li>
+
+                        <li class="xn-openable deactive" id="report">
+                            <a href="/report"><span class="fa fa-dollar"></span> <span class="xn-text">Report</span></a>
+                            <ul>
+                                <li id="referral_report">
+                                    <a style="background: #273541">
+                                        <form method="post" action="/referral_report">
+                                            <button type="submit" class="btn btn-default" style="border-color: #273541; background-color: #273541; text-align: left; color: white; width: 100%;"><span class="fa fa-dollar"></span> <span class="xn-text">User Referral Report</span></button>
+                                        </form>
+                                    </a>
+                                </li>
+                                <li id="provider_referral_report">
+                                    <a style="background: #273541">
+                                        <form method="post" action="/provider_referral_report">
+                                            <button type="submit" class="btn btn-default" style="border-color: #273541; background-color: #273541; text-align: left; color: white; width: 100%;"><span class="fa fa-dollar"></span> <span class="xn-text">Driver Referral Report</span></button>
+                                        </form>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+
+                        <li class="xn-openable deactive" id="setting_menu">
+                            <a href="/settings "><span class="fa fa-gears "></span> <span class="xn-text ">Settings</span></a>
+                            <ul>
+
+                                <li id="languages"><a href="/languages"><span class="fa fa-language
+                                                                              "></span> <span class="xn-text ">Languages</span></a></li>
+                                <li id="settings"><a href="/settings"><span class="fa fa-cog
+                                                                            "></span> <span class="xn-text ">Basic Settings</span></a></li>
+                                <li id="installation_settings"><a href="/installation_settings"><span class="fa fa-list-ol "></span> <span class="xn-text ">Installation Settings</span></a></li>
+                                <li id="promotions"><a href="/promotions"><span class="glyphicon glyphicon-gift
+                                                                                "></span> <span class="xn-text">Promo Codes</span></a></li>
+                                <li id="documents"><a href="/documents"><span class="fa fa-files-o
+                                                                              "></span> <span class="xn-text ">Documents</span></a></li>
+
+
+                                <li id="email"><a href="/email"><span class="glyphicon glyphicon-envelope
+                                                                      "></span> <span class="xn-text ">Mail Template</span></a></li>
+
+                                <li id="sms"><a href="/sms"><span class="glyphicon glyphicon-envelope
+                                                                  "></span> <span class="xn-text ">SMS Template</span></a></li>
+                                <li id="admin_list"><a href="/admin_list"><span  class="fa fa-user-md"></span> <span class="xn-text">Admin Settings</span></a></li>
+                                <li id="terms_and_privacy_setting"><a href="/terms_and_privacy_setting"><span  class="fa fa-user-md"></span> <span class="xn-text">Terms And Privacy Setting</span></a></li>
+
+
+                                <!--<li id="# "><a href="# "><span class="fa fa-files-o
+            "></span> <span class="xn-text "></span></a></li>-->
+                            </ul>
+                        </li>
+
+                        <li class="xn-openable deactive " id="send_mass_notification_menu">
+                            <a href="# "><span class="glyphicon glyphicon-send
+                                               "></span> <span class="xn-text ">Send Mass Notification</span></a>
+                            <ul>
+                                <li id="send_mass_notification"><a href="/send_mass_notification"><span class="glyphicon glyphicon-envelope
+                                                                                                         "></span> <span class="xn-text ">Send Mass Notification</span></a></li>
+
+
+<!--                                               <li id="send_mass_notification"><a href="/send_mass_sms"><span class="glyphicon glyphicon-envelope
+                                                                                                         "></span> <span class="xn-text ">Send Mass SMS</span></a></li>-->
+                            </ul>
+                        </li>
+
+                    </ul>
+                </ul>
+                <!-- END X-NAVIGATION -->
+            </div>
+            <!-- END PAGE SIDEBAR --> 
+            <!-- PAGE CONTENT -->
+            <div class="page-content ">
+
+                <!-- START X-NAVIGATION VERTICAL -->
+                <ul class="x-navigation x-navigation-horizontal x-navigation-panel ">
+                    <li class="xn-icon-button">
+                        <a href="#" class="x-navigation-minimize"><span class="fa fa-dedent"></span></a>
+                    </li>
+                    <li style="text-align: center; width: 75%; ">
+                        <a href="# " class="mb-control pagination-centered "> <span id="page_title" class="mb-control pagination-centered "></span></a>
+                    </li>
+                    <li>
+                        <select id = "languageId">
+                                <option selected disabled hidden style='display: none' >Select Language..</option>
+                                <option value="English"> English</option>
+                        </select>
+                    </li>
+                    <li class="xn-icon-button pull-right last">
+
+                        <a href="sign_out "><span class="fa fa-power-off "></span></a>
+                    </li>        
+                </ul>
+
+
+
+<script type="text/javascript">
+
+        $("#languageId").change(function(){
+             
+                 // console.log(window.location.pathname);
+                // document.cookie = "language="+this.value ;
+              $.ajax({
+                type: 'POST',
+                 url: '/change_language',
+                 data: {'language': this.value},
+                 dataType: "json",
+                 success: function (response) {
+                    console.log(response)
+                     // alert(JSON.stringify(response));
+                       // console.log(window.location.pathname);
+                     window.location.reload();
+                 }
+            })
+
+
+            // alert("The text has been changed." + this.value);
+        });
+
+</script> 
+               
+                <!-- PAGE CONTENT WRAPPER -->
+                <div class="page-content-wrap">
+       
+                <!-- START TIMELINE FILTER --> 
+               
+        <div class="col-md-12">
+          <div class="panel panel-default">
+            <div class="panel-body">
+              <form class="form-horizontal" role="form" method="post" action="/today_requests">
+                <div class="form-group">
+                  <input type="hidden" name="page" id="page" value="0" />   
+                   <input type="hidden" name="request" value="today_requests" />
+
+                  
+                <div class="col-md-4">
+                <div style="text-align: center;">
+                  <label>SORT</label>   
+                </div>
+                <div class="col-md-6">
+                  <div class="input-group">
+                    <span class="input-group-addon"><span class="glyphicon glyphicon-sort"></span></span>
+                    <select class="form-control select" placeholder="Select to Sort" name="sort_item">
+                      
+                        <option value='labRequisitionID' selected="selected">Lab Requisition Id
+                        <!-- <option value='user_detail.unique_id'>User ID</option>
+                        <option value='user_detail.first_name'>User Name</option>
+                        <option value='provider_detail.unique_id'>Provider ID</option> -->
+                        <option value='provider_detail.first_name' >Provider Name</option>
+                      
+                    </select>
+                  </div>
+                </div>
+                
+                <div class="col-md-4">
+                  <div class="input-group">
+                    <span class="input-group-addon"><span class="glyphicon glyphicon-sort"></span></span>
+                    <select class="form-control select" placeholder="Select to Sort" name="sort_item">
+                     
+                      <option value="1" >Ascending</option>
+                      <option value="-1" selected>Descending</option>
+                      
+                    </select>
+                  </div>
+                </div>
+              </div>
+               
+              <div class="col-md-4">
+                <div style="text-align: center;">
+                  <label>SEARCH</label>   
+                </div>
+               <!-- Today's Request -->
+                <div class="col-md-6">
+                  <div class="input-group">
+                    <span class="input-group-addon"><span class="glyphicon glyphicon-search"></span></span>
+                    <select class="form-control select" id="sel" placeholder="Select to Search" name="search_item">
+                      
+                        <option value='labRequisitionID'>Lab Requisition Id</option>
+                        <option value='user_detail.first_name' selected="selected">Patient Name</option>
+                        <option value='source_address'>Draw Locations</option>
+                        <option value='destination_address'>Drop-off Locations</option>
+                        
+                        <option value='created_at'>Created Date</option>
+                        <option value='schedule_start_time' >Scheduled Date</option>
+                        
+                    </select>
+                    </select>
+                  </div> 
+                </div>
+              
+                <div class="col-md-6">
+                  <div class="panel panel-default">
+                    <div class="panel-body panel-body-search">
+                      <div class="input-group">
+                        <span class="input-group-addon"><span class="fa fa-search"></span></span>
+                        <input type="text" class="form-control" value="" name="search_value" placeholder="Search..."/>
+                      </div>                                                                
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div style="text-align: center;">
+                  <label>Schedule Date Filter</label>   
+                </div>
+                <div class="col-md-12">
+
+                  <div class="btn-group">
+                    <div class="input-group">
+                      <input type="text" class="form-control datepicker" value="" placeholder="Start Date" name="start_date" id="start_date" readonly/>
+                      <span class="input-group-addon add-on">-</span>
+                      <input type="text" class="form-control datepicker"  value="" placeholder="End Date" name="end_date" id="end_date" readonly/>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            
+            <div class="col-md-6">
+                          
+              <div class="col-md-8">
+                <div style="text-align: center;">
+                  <label>Page No.</label>
+              </div>
+                  <ul class="pagination">
+                      
+
+
+                  </ul>
+              </div>
+          </div> 
+            <div class="col-md-3">
+              <div class="col-md-6">
+                <div style="text-align: center;">
+                  <label>Status</label>
+              </div>
+              <div class="col-md-12" style="padding: 0px;">
+             <select class="form-control select" id="status" placeholder="Select Status" name="status">
+                  
+                                <option value='0'>Eligibility Pending</option>
+                                <option value='2'>Pending Assignment</option>
+                                <option value='3' >Pending Schedule</option>
+                                <option value='4'>Waiting Collection</option>
+                                <option value='11'>Waiting Specimen</option>
+                                <option value='7'>Hold</option>
+                                <option value='101'> Cancelled</option>
+                                <option value='1'>Insurance Rejected</option>
+                                <option value='1000'selected>All</option>
+                                
+               </select>
+             </div>
+           </div>
+          <div class="col-md-6">
+            <div style="text-align: center;">
+              <label>Payment</label>
+          </div>
+              <div class="col-md-12" style="padding: 0px;">
+             <select class="form-control select" id="payment" placeholder="Select Payment Mode" name="payment">
+                  
+                    <option value='2' selected>Both</option>
+                    <option value='1'>Cash</option>
+                    <option value='0'>Card</option>
+                  
+               </select>
+             </div>
+           </div>
+            </div>
+            <div class="col-md-3">
+             
+              <div  class="form-group col-md-6" style="padding: 0px;" >
+                <div>
+                  <div style="text-align: center;">
+                    <label>Submit</label>
+                </div>
+                <div class="col-md-6">
+                  <button type="submit" id="apply_filter" class="btn btn-primary" style="height: 35px; width: 220%;  "><span>Apply</span></button>
+                </div>
+              </div>
+              </div>    
+              <div class="col-md-6">
+             
+              <div  class="form-group col-md-6" style="padding: 0px;" >
+                <div>
+                  <div style="text-align: center;">
+                    <label>Total Count</label>
+                </div>
+                <div class="col-md-12">
+                 <!-- <label>Total Count</label> -->
+                 <b><label>753</label></b>
+                </div>
+              </div>
+              </div>   
+          </form>
+
+
+        </div>
+      </div>
+    </div>
+  </div> 
+        
+      <!-- END TIMELINE FILTER -->                
+                
+                    <div class="row">
+                        <div class="col-md-12">
+
+                            <!-- START SIMPLE DATATABLE -->
+                            <div class="panel panel-default">                                
+                                <div class="table-responsive" style="padding-bottom: 175px;">
+                                        <table class="table text-center" id="customers2">
+                                            <thead>                                             
+                                              <tr>
+
+                                                <th>
+                                                  Lab Requisition Id
+                                              </th>
+                                              <th>
+                                                Patient Name
+                                              </th>
+                                              <th>
+                                                Scheduled Date &amp; Time
+
+                                              </th>
+                                              <th>
+                                                Created Date &amp; Time
+                                              </th>
+                                               <th>
+                                                Test Name
+                                              </th>
+                                                <th>
+                                                  Draw Locations
+                                                </th>
+                                                <th>
+                                                  Drop-off Locations
+                                                </th>
+                                                
+                                                <th>
+                                                  Clinic Name
+                                                </th>
+                                                <th>
+                                                  Phlebotomist Name
+                                                </th>
+                                                <th >
+                                                  Status
+                                                </th>
+                                                <th >
+                                                  Payment
+                                                </th>
+                                                <th >
+                                                  Action
+                                                </th>
+                                              </tr>
+                                            </thead>
+                                            
+                                            <tbody>
+                                              
+                                              
+                                            </tbody>
+                                        </table>
+                                    </div>
+                            </div>
+                            <!-- END SIMPLE DATATABLE -->
+
+                        </div>
+                    </div>                                
+                    
+                </div>
+                <!-- PAGE CONTENT WRAPPER -->                                
+            </div>    
+            <!-- END PAGE CONTENT -->
+        </div>
+        <!-- END PAGE CONTAINER -->  
+
+        <script src="socket.io/socket.io.js"></script>
+        <script>
+          
+
+        </script>
+
+        <script type="text/javascript">
+  $(document).ready(function() {
+
+      var trip_id_array = new Array();
+      var interval;
+      
+       $('#start_date').datepicker({
+         format: 'yyyy-mm-dd',
+         endDate: new Date(Date.now())
+
+       }).on("input change", function (e) { 
+        var end_date = $('#start_date').datepicker('getDate');
+        end_date.setDate(end_date.getDate() + 1);
+        $('#end_date').datepicker('setStartDate', end_date);
+        $('.datepicker-dropdown').hide()
+      });
+
+       $('#end_date').datepicker({
+         format: 'yyyy-mm-dd',
+         endDate: new Date(Date.now())
+
+       }).on("input change", function (e) { 
+        var start_date = $('#end_date').datepicker('getDate');
+        start_date.setDate(start_date.getDate() - 1);
+        $('#start_date').datepicker('setEndDate', start_date);
+
+        $('.datepicker-dropdown').hide()
+      });
+
+   
+        
+
+        if('today_requests' == 'today_requests')
+        {
+            
+        }
+
+       if(trip_id_array.length >0)
+       {
+          clearInterval(interval);
+          interval = setInterval(function () {
+            $.ajax({
+                type: 'POST',
+                url: '/requsest_status_ajax',
+                data: {'trip_id_array':trip_id_array},
+                dataType: "json",
+                success: function (res) {
+                  res.forEach(function(trip_data){
+
+                    $('#provider'+trip_data.trip_detail._id).html(trip_data.provider);
+                    $('#pr_name'+trip_data.trip_detail._id).html(trip_data.provider);
+
+                    if(trip_data.trip_detail.is_trip_cancelled == 1)
+                    {
+                      if(trip_data.trip_detail.is_trip_cancelled_by_provider == 1)
+                      {
+                        $('#'+trip_data.trip_detail._id).html('<span class="label label-danger">Cancelled by Provider</span>');
+                      }
+                      else if(trip_data.trip_detail.is_trip_cancelled_by_user == 1)
+                      {
+                          $('#'+trip_data.trip_detail._id).html('<span class="label label-danger">Cancelled by user</span>');
+                      }
+                      else
+                      {
+                          $('#'+trip_data.trip_detail._id).html('<span class="label label-danger">Cancelled</span>');
+                      }
+                    }
+                    else
+                    {
+                      if(trip_data.trip_detail.is_provider_status == 2)
+                      {
+                          $('#'+trip_data.trip_detail._id).html('<span class="label label-warning">Coming</span>');
+                      }
+                      else if(trip_data.trip_detail.is_provider_status == 4)
+                      {
+                          $('#'+trip_data.trip_detail._id).html('<span class="label label-info">Arrived</span>');
+                      }
+                      else if(trip_data.trip_detail.is_provider_status == 6)
+                      {
+                          $('#'+trip_data.trip_detail._id).html('<span class="label label-info">Started</span>');
+                      }
+                      else if(trip_data.trip_detail.is_provider_status == 9)
+                      {
+                          $('#'+trip_data.trip_detail._id).html('<span class="label label-success">Completed</span>');
+                          $('#amount'+trip_data.trip_detail._id).html(trip_data.trip_detail.total);
+
+                          if(trip_data.trip_detail.is_pending_payments == 1)
+                          {
+                              $('#payment_status'+trip_data.trip_detail._id).html('<span class="label label-danger">N/A</span>');
+                          }
+                          else
+                          {
+                            if(trip_data.trip_detail.is_paid == 1)
+                            {
+                                $('#payment_status'+trip_data.trip_detail._id).html('<span class="label label-success">Paid</span>');
+                            }
+                            else
+                            {
+                                $('#payment_status'+trip_data.trip_detail._id).html('<span class="label label-danger">N/A</span>');
+                            }
+                          }
+                          
+                      }
+                      else if(trip_data.trip_detail.is_provider_status == 1 || trip_data.trip_detail.is_provider_status == 0)
+                      {
+                          if(trip_data.trip_detail.is_provider_accepted == 1)
+                          {
+                            $('#'+trip_data.trip_detail._id).html('<span class="label label-info">Accepted</span>');
+                          } 
+                          else
+                          {
+                            $('#'+trip_data.trip_detail._id).html('<span class="label label-info">Waiting</span>');
+                          }
+                      }
+                    }
+                  })
+                }
+            });
+          },10000);
+       }
+   
+ });
+  
+  function completetrip(tripid, provider_id, is_tip){
+    $.ajax({
+      type: 'POST',
+      url: '/completetrip',
+      data: {trip_id: tripid, provider_id: provider_id, toll_amount: 0, bearing: 0},
+      dataType: "json",
+      success: function (res) {
+        
+        emit_data(tripid)
+        if(res.success && is_tip == 'false'){
+          $.ajax({
+            type: 'POST',
+            url: '/pay_payment',
+            data: {trip_id: tripid, tip_amount: 0, payment_id: '', provider_id: provider_id},
+            dataType: "json",
+            success: function (res) {
+              emit_data(tripid)
+              location.reload()
+            }
+          });
+        } else {
+          location.reload()
+        }
+      }
+    });
+  }
+
+  function cancel_by_admin(tripid){
+    $.ajax({
+      type: 'POST',
+      url: '/tripcancelbyadmin',
+      data: {trip_id: tripid},
+      dataType: "json",
+      success: function (res) {
+        emit_data(tripid)
+        location.reload()
+      }
+    });
+  }
+
+  var URL = window.location.protocol + '//'+ window.location.hostname;
+  var socket = io.connect(URL);
+
+
+  socket.on('connect',function() {
+  });
+
+  function emit_data(tripid){
+    socket.emit('trip_detail_notify', {trip_id: tripid})
+  }
+
+  socket.on('disconnect',function() {
+  });
+
+  function export_excel(){
+    $.ajax({
+      type: 'POST',
+      url: '/genetare_request_excel',
+      data: $('.form-horizontal').serialize(),
+      dataType: "json",
+      success: function (res) {
+          window.open(res)
+      }
+    });
+  }
+
+</script>  
+<!-- START THIS PAGE PLUGINS-->        
+        <!--/////For Table Responsive & Export as File /////-->
+        <script type="text/javascript">
+        $(document).ready(function(){
+                setTimeout(function() {
+                    $('.alert').fadeOut('fast');
+                }, 3000)
+            });
+</script>  
+        <script type='text/javascript' src='js/dist/table2excel.js'></script>
+        <script type='text/javascript' src='js/plugins/bootstrap/bootstrap-datepicker.js'></script>
+        <script type='text/javascript' src='js/plugins/jquery-validation/jquery.validate.js'></script>                
+       
+        <!-- END PLUGINS -->
+  <script type='text/javascript' src='js/plugins/bootstrap/bootstrap-select.js'></script>
+  
+<script type="text/javascript" src="js/plugins/tableexport/tableExport.js"></script>
+<script type="text/javascript" src="js/plugins/tableexport/jquery.base64.js"></script>
+        <!-- START THIS PAGE PLUGINS-->        
+        
+       <script type="text/javascript" src="js/settings.js"></script>
+        <script type="text/javascript" src="js/plugins.js"></script> 
+        <!-- END TEMPLATE -->
+    </html>
+    <script>
+
+    $(document).ready(function(){ 
+       setTimeout(function() {
+                    $.ajax({
+                        type: 'POST',
+                         url: '/check_language',
+                         data: {'type' : 'admin'},
+                         dataType: "json",
+                         success: function (response) {
+                        }
+                    })
+        }, 1000)
+    })
+</script>

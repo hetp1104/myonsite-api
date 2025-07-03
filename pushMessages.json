@@ -1,0 +1,29 @@
+{
+    "PUSH_CODE_FOR_NEW_TRIP" :{ "code": "201","title":"Requisition","message":"Provider new requisition"},
+    "PUSH_CODE_FOR_ACCEPT_TRIP" : { "code": "203","title":"Requisition","message":"Requisition accepted"},
+    "PUSH_CODE_FOR_TRIP_CANCELLED_BY_USER" : { "code": "205","title":"Requisition","message":"Requisition cancelled by user"},
+    "PUSH_CODE_FOR_PROVIDER_APPROVED" : { "code": "207","title":"Provider","message":"Provider approved"},
+    "PUSH_CODE_FOR_PROVIDER_DECLINED" : { "code": "208","title":"Provider","message":"Provider declined"},
+    "PUSH_CODE_FOR_SET_DESTINATION" : { "code": "210","title":"Requisition","message":"User set draw location"},
+    "PUSH_CODE_FOR_PAYMENT_MODE_CASH" :  { "code": "211","title":"Payment","message":"User change payment type to cash"},
+    "PUSH_CODE_FOR_PAYMENT_MODE_CARD" : { "code": "212","title":"Payment","message":"User change payment type to card"},
+	"PUSH_CODE_FOR_WAITING_FOR_TIP" : { "code": "240","title":"Trip","message":"Waiting tip"},
+    "PUSH_CODE_FOR_PROVIDER_TRIP_END" : { "code": "241","title":"Requisition","message":"Provider Requisition/Specimen Collected"},
+    "PUSH_CODE_FOR_LOGOUT_ANOTHER_DEVICE" :  { "code": "242","title":"Provider","message":"Provider logout"},
+
+    "PUSH_CODE_FOR_PROVIDER_COMMING_YOUR_LOCATION" : { "code": "200","title":"Provider","message":"Provider comming to your location"},
+    "PUSH_CODE_FOR_PROVIDER_ARRIVED" : { "code": "204","title":"Provider","message":"Provider arrived"},
+    "PUSH_CODE_FOR_YOUR_TRIP_STARTED" : { "code": "206","title":"Provider","message":"Provider started trip"},
+    "PUSH_CODE_FOR_YOUR_TRIP_END" : { "code": "209","title":"Requisition","message":"Requisition/Specimen Collected"},
+    
+    "PUSH_CODE_FOR_NO_PROVIDER_FOUND" : { "code": "213","title":"Requisition","message":"No provider found"},
+    "PUSH_CODE_FOR_TRIP_CANCELLED_BY_PROVIDER" : { "code": "214","title":"Requisition","message":"Requisition cancelled by provider"},
+    "PUSH_CODE_FOR_USER_APPROVED" : { "code": "215","title":"User","message":"User approved"},
+    "PUSH_CODE_FOR_USER_DECLINED" : { "code": "216","title":"User","message":"User declined"},
+
+    "PUSH_CODE_FOR_USER_LOGIN_IN_OTHER_DEVICE" : { "code": "220","title":"Login","message":"User login at another device"},
+    "PUSH_CODE_FOR_PROVIDER_LOGIN_IN_OTHER_DEVICE" : { "code": "230","title":"Login","message":"Provider login at another device"},
+    "PUSH_CODE_FOR_NEW_CORPORATE_REQUEST": { "code": "231","title":"Corporate request","message":"New corporate request"},
+    "PUSH_CODE_FOR_TRIP_ACCEPTED_BY_ANOTHER_PROVIDER": { "code": "232","title":"Requisition","message":"Requisition accepted by another provider"},    
+    "PUSH_CODE_FOR_SCHEDULE_TRIP" : { "code": "202","title":"Requisition","message":"New Requisition scheduled"}
+}

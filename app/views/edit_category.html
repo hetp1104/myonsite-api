@@ -1,0 +1,43 @@
+<%- include('header.html') %>
+
+<div class="page-content-wrap">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">Edit Category</h3>
+        </div>
+        <div class="panel-body">
+            <form class="form-horizontal" role="form" method="post" action="/update_category">
+                <!-- Hidden input field to store category id -->
+                <input type="hidden" name="id" value="<%= category_data._id %>">
+                
+                <!-- Category Name Input -->
+                <div class="form-group">
+                    <label class="col-md-3 control-label">Category Name:</label>
+                    <div class="col-md-6">
+                        <input type="text" class="form-control" name="category_name" value="<%= category_data.category_name %>">
+                    </div>
+                </div>
+                
+                 <!-- Active Status Toggle -->
+            <div class="form-group">
+                <label class="col-md-3 control-label">Active Status:</label>
+                <div class="col-md-6">
+                    <label class="switch">
+                        <input type="checkbox" name="active" checked>
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+            </div>
+                
+                <!-- Submit Button -->
+                <div class="form-group">
+                    <div class="col-md-offset-3 col-md-6">
+                        <button type="submit" class="btn btn-success">Update Category</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<%- include('footer_list.html') %>

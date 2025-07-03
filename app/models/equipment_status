@@ -1,0 +1,20 @@
+/*** 
+ * Equipment Status Model 
+ * Created By: Krina Shah
+ * Created Date: 23-Jul-2024
+ * ***/
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
+
+const EquipmentStatusSchema = new Schema({
+    sysid: { type: String, required: true },
+    provider_id: { type: Schema.Types.ObjectId, ref: 'Provider', required: true },
+    trip_id: { type: Schema.Types.ObjectId, ref: 'TripOrder', required: true },
+    DTM: { type: Date, default: Date.now },
+    supplies_name: { type: String, required: true },
+    checked: { type: Boolean, default: false }
+});
+
+EquipmentStatusSchema.index({ sysid: 1, provider_id: 1, trip_id: 1 }, { background: true });
+
+module.exports = mongoose.model('EquipmentStatus', EquipmentStatusSchema, 'equipment_statuses');

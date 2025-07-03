@@ -1,0 +1,169 @@
+<%- include ('header.html') %>
+<div class="page-content-wrap">
+
+<% if(typeof message != 'undefined'){ %>
+<div class="alert alert-success" role="alert">
+    <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only"><%= config_json.button_close %></span></button>
+    <p align="center"> <strong><%= message %></strong></p>
+</div>
+<% } %> 
+
+<!-- Add this for debugging -->
+<script>
+    console.log('Setting detail object:', <%= JSON.stringify(setting_detail) %>);
+</script>
+
+<div class="row">
+    <div class="col-md-12">
+
+        <!-- START SIMPLE DATATABLE -->
+        <div class="panel panel-default">                                
+
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th><%= config_json.title_name %></th>
+                        <th><%= config_json.title_expired_date %></th>
+                        <th><%= config_json.title_unique_code %></th>
+                        <th><%= config_json.title_document %></th>
+                        <th><%= config_json.button_action %></th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <% detail.forEach(function(data){ %>
+                    <tr>
+                        <td><%= data.name %></td>
+                        <% if(data.expired_date == null || data.expired_date == "" ) { %>
+                        <td><%= config_json.title_no_expiry_date %></td>
+                        <% } else if(data.is_document_expired == false){ %>
+                        <td><%= moment(data.expired_date).format("DD MMM 'YY") %></td>
+                        <% } else {%>
+                        <td>Expired</td>
+                        <% } %>
+                        <td><%= data.unique_code %></td>
+                        
+                        <td class="open-popup">
+                            <% if(data.document_picture && data.document_picture !== '') { %>
+                                <a class="image-popup-vertical-fit" 
+                                   href="<%= setting_detail.image_base_url + data.document_picture %>" 
+                                   data-id="<%= data._id %>"
+                                   data-approve="Approve"
+                                   data-reject="Reject"
+                                   title="<%= data.name %>">
+                                    <img src="<%= setting_detail.image_base_url + data.document_picture %>" 
+                                         alt="<%= data.name %>" 
+                                         height="50" 
+                                         width="50"
+                                         onerror="this.onerror=null; this.src='web_images/default.png';">
+                                </a>
+                            <% } else { %>
+                                <img src="web_images/default.png" alt="No Image" height="50" width="50">
+                            <% } %>
+                        </td>
+                        <td>
+                            <div class="btn-group" style="margin-right:15px;">
+                                <a href="#" data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><%= config_json.button_action %> <span class="caret"></span></a>
+                                <ul class="dropdown-menu" role="menu">
+                                    <% if(data.document_picture && data.document_picture !== ""){ %>
+                                        <li>
+                                            <form method="post" action="/download_provider_document">
+                                                <input type="hidden" name="id" value="<%= data._id %>" />
+                                                <button type="submit" class="btn btn-default" style="width:100%;"><%= config_json.button_view_download %></button>
+                                            </form>
+                                        </li>
+                                    <% } %>
+                                    <li>
+                                        <form method="post" action="/provider_documents_edit">
+                                            <input type="hidden" name="id" value="<%= data._id %>" />
+                                            <button type="submit" class="btn btn-default" style="width:100%;"><%= config_json.title_edit_document %></button>
+                                        </form>
+                                    </li>
+                                    <% if(data.document_picture && data.document_picture !== ""){ %>
+                                        <li>
+                                            <form method="post" action="/provider_documents_delete">
+                                                <input type="hidden" name="id" value="<%= data._id %>" />
+                                                <button type="submit" class="btn btn-default" style="width:100%;"><%= config_json.title_delete_document %></button>
+                                            </form>
+                                        </li>
+                                    <% } %>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+
+        </div>
+        <!-- END SIMPLE DATATABLE -->
+
+    </div>
+</div>                                
+
+</div>
+<!-- PAGE CONTENT WRAPPER -->                                
+</div>    
+<!-- END PAGE CONTENT -->
+</div>
+</div>
+<!-- END PAGE CONTAINER --> 
+
+<!-- Add Magnific Popup CSS and JS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/magnific-popup.js/1.1.0/magnific-popup.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/magnific-popup.js/1.1.0/jquery.magnific-popup.min.js"></script>
+
+<script>
+$(document).ready(function() {
+    // Initialize Magnific Popup for document images
+    $('.image-popup-vertical-fit').magnificPopup({
+        type: 'image',
+        closeOnContentClick: false,
+        mainClass: 'mfp-img-mobile',
+        image: {
+            verticalFit: true,
+            titleSrc: function(item) {
+                return '<div class="document-actions">' +
+                    '<form method="post" action="/approve_provider_document">' +
+                    '<input type="hidden" name="id" value="' + item.el.attr('data-id') + '" />' +
+                    '<button type="submit" class="btn btn-success" style="width:100%;margin-bottom:5px;">' + 
+                    item.el.attr('data-approve') + '</button>' +
+                    '</form>' +
+                    '<form method="post" action="/reject_provider_document">' +
+                    '<input type="hidden" name="id" value="' + item.el.attr('data-id') + '" />' +
+                    '<button type="submit" class="btn btn-danger" style="width:100%;">' + 
+                    item.el.attr('data-reject') + '</button>' +
+                    '</form>' +
+                    '</div>';
+            }
+        },
+        callbacks: {
+            imageLoadComplete: function() {
+                console.log('Image successfully loaded');
+            },
+            open: function() {
+                console.log('Popup opened');
+            },
+            error: function() {
+                console.error('Error loading image');
+                // Display a friendly error message
+                $('.mfp-img').parent().html('<div class="mfp-error-msg">The image could not be loaded. Please check if the file exists on the server.</div>');
+            }
+        },
+        gallery: {
+            enabled: true
+        }
+    });
+
+    // Add custom styles for popup
+    $('head').append(
+        '<style>' +
+        '.mfp-img-mobile .mfp-content { background-color: white; padding: 20px; }' +
+        '.document-actions { margin-top: 15px; }' +
+        '.mfp-error-msg { color: red; text-align: center; padding: 10px; }' +
+        '</style>'
+    );
+});
+</script>
+
+<%- include ('footer_list.html') %>

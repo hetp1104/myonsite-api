@@ -1,0 +1,287 @@
+<%- include('header.html') %>
+  <div class="page-content-wrap"> 
+    <div class="row">
+      <div class="panel panel-default">
+        <div class="panel-body panel-body-map">
+          <div class="col-md-3">
+            <select class="form-control select" data-live-search="true" name="providerid" id='providerid'>
+              <option selected disabled value='select'>Select a Provider</option>
+              <% providerNames.forEach(function(providerName) { %>
+                <option value="<%= providerName %>">
+                  <%= providerName %>
+                </option>
+                <% }); %>
+            </select>
+          </div>
+          <div class="date-filter">
+            <label for="daterange">Select Date:</label>
+            <input type="date" id="daterange" name="daterange">
+          </div>
+          <div class="panel-body panel-body-map">
+            <div id="map" style="width: 100%; min-height: 615px;"></div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-3">
+    <div id="total-distance"></div> <!-- Display total distance here -->
+    <div id="marker-distances"></div> <!-- Display marker distances here -->
+    <!-- Add this section after the existing HTML code -->
+    <div class="col-md-9">
+      <div id="trip-data-container"></div>
+    </div>
+
+  </div>
+  <script src="<%=map_url%>"></script>
+  <script type="text/javascript" src="js/marker_animation.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+    google.maps.event.addDomListener(window, 'load', initialize);
+
+    function initialize() {
+      var map_view = {
+        center: new google.maps.LatLng(37, -95),
+        zoom: 5,
+        mapTypeId: google.maps.MapTypeId.ROADMAP
+      };
+
+      var map = new google.maps.Map(document.getElementById("map"), map_view);
+
+  
+      var markers = []; // Array to store all markers
+      var polylines = []; // Array to store all polylines
+      var tripMarkers = [];
+      var providerMarkerPositions = {};
+      var iconBase = '/map_pin/';
+      var directionsService = new google.maps.DirectionsService();
+      var directionsDisplay = new google.maps.DirectionsRenderer()
+
+      directionsDisplay.setMap(map);
+
+
+      // Fetch trip data for the selected provider
+      function fetchPatientTripData(selectedProvider) {
+        fetch('/getPatientTripData?provider=' + selectedProvider)
+          .then((response) => response.json())
+          .then((data) => {
+            console.log('Received trip data:', data);
+            // Call the function to add source location markers to the map
+            addSourceLocationMarkers(data);
+
+
+          })
+          .catch((error) => {
+            console.error('Error fetching trip data:', error);
+          });
+      }
+
+      fetchPatientTripData();
+
+    <% assetReadings.forEach(function (assetReading) { %>
+        var lat = Number('<%= assetReading.Value1 %>');
+        var lng = Number('<%= assetReading.value2 %>');
+        var providerName = '<%= assetReading.ProviderName %>';
+        var readingDate = '<%= assetReading.ReadingDateTime %>';
+        var position = new google.maps.LatLng(lat, lng);
+        var ProviderID = '<%= assetReading.ProviderID %>';
+
+
+        // Check if marker position already exists in providerMarkerPositions
+        if (!providerMarkerPositions.hasOwnProperty(position.toString())) {
+          var marker = new google.maps.Marker({
+            position: position,
+            map: null, // Initialize marker with map set to null
+            icon: iconBase + 'provider.png',
+          });
+
+          marker.providerName = '<%= assetReading.ProviderName %>'; // Store provider name as a property of the marker
+          marker.date = new Date(readingDate).toISOString().split('T')[0]; // Convert the date to yyyy-mm-dd format
+          markers.push(marker); // Add marker to the markers array
+
+          // Store the marker position in providerMarkerPositions
+          providerMarkerPositions[position.toString()] = true;
+        }
+        <% }); %>
+
+
+function addSourceLocationMarkers(trips) {
+      // Remove existing trip markers from the map
+      tripMarkers.forEach((marker) => marker.setMap(null));
+
+      // Create new trip markers and add them to the map
+      trips.forEach((trip) => {
+        const { sourceLocation, user_first_name, user_last_name, status ,labRequisitionID } = trip;
+        const tripLocation = new google.maps.LatLng(sourceLocation[0], sourceLocation[1]);
+
+        const tripMarker = new google.maps.Marker({
+          position: tripLocation,
+          map: map,
+          icon: iconBase + "Group.png",
+          title: `${user_first_name} ${user_last_name} - ${status} (Lab ID: ${labRequisitionID})`,
+        });
+
+        tripMarkers.push(tripMarker);
+
+        tripMarker.addListener('click', function () {
+          const tripInfoWindow = new google.maps.InfoWindow({
+            content: `<p><strong>PatientName:</strong> ${user_first_name} ${user_last_name}</p><p><strong>RequisitionID:</strong> ${labRequisitionID}</p>`,
+          });
+          tripInfoWindow.open(map, tripMarker);
+        });
+      });
+    }
+
+        // Function to get the marker alphabet for a given index
+        function getMarkerAlphabet(index) {
+          return String.fromCharCode(65 + index); // ASCII code for 'A' is 65
+        }
+
+      // Function to calculate and display route
+      function calculateAndDisplayRoute(selectedProvider, selectedDate) {
+        // Filter markers based on selected provider and date
+        var selectedMarkers = markers.filter(function (marker) {
+          return (marker.providerName === selectedProvider || selectedProvider === 'select') &&
+            (!selectedDate || marker.date === selectedDate);
+        });
+
+        if (selectedMarkers.length >= 2) {
+          var origin = selectedMarkers[0].getPosition();
+          var destination = selectedMarkers[selectedMarkers.length - 1].getPosition();
+          var waypoints = [];
+
+
+          for (var i = 1; i < selectedMarkers.length - 1; i++) {
+            waypoints.push({
+              location: selectedMarkers[i].getPosition(),
+              stopover: true
+            });
+          }
+
+          var request = {
+            origin: origin,
+            destination: destination,
+            waypoints: waypoints,
+            optimizeWaypoints: true,
+            travelMode: google.maps.TravelMode.DRIVING
+          };
+
+          directionsService.route(request, function (response, status) {
+            if (status === google.maps.DirectionsStatus.OK) {
+              directionsDisplay.setDirections(response);
+
+              // // Change marker icons for origin and destination markers
+              // selectedMarkers[0].setIcon(iconBase + 'pickup.png');
+              // selectedMarkers[selectedMarkers.length - 1].setIcon(iconBase + 'destination.png');
+
+              // Calculate total distance
+              var totalDistance = 0;
+              response.routes[0].legs.forEach(function (leg) {
+                totalDistance += leg.distance.value;
+              });
+              console.log("Total Distance:", totalDistance); 
+              // Convert total distance to miles and kilometers
+              var totalDistanceMiles = (totalDistance * 0.000621371).toFixed(2);
+              var totalDistanceKilometers = (totalDistance / 1000).toFixed(2);
+              console.log("Total Distance in Miles:", totalDistanceMiles); 
+              console.log("Total Distance in Kilometers:", totalDistanceKilometers); 
+
+              // Display the total distance in miles and kilometers
+              var totalDistanceElement = document.getElementById("total-distance");
+              totalDistanceElement.innerHTML = "Distance Traveled: <strong>" + totalDistanceMiles + " miles</strong> (<strong>" + totalDistanceKilometers + " km</strong>)";
+              totalDistanceElement.style.fontSize = "17px"; // Set the font size to 20 pixels
+
+              // Display distances between markers with marker alphabets
+              var markerDistancesElement = document.getElementById("marker-distances");
+              markerDistancesElement.innerHTML = "";
+              
+              console.log("miles");
+              for (var i = 0; i < selectedMarkers.length - 1; i++) {
+                var legDistance = response.routes[0].legs[i].distance;
+                var distanceMiles = (legDistance.value * 0.000621371).toFixed(2);
+                var distanceKilometers = (legDistance.value / 1000).toFixed(2);
+                var legElement = document.createElement("div");
+                legElement.innerHTML = "From <strong>" + getMarkerAlphabet(i) + "</strong> to <strong>" + getMarkerAlphabet(i + 1) + "</strong>: <strong>" + distanceMiles + " miles</strong> (" + distanceKilometers + " km)<br>";
+                  // Create an object with the data to send
+                var dataToSend = {
+                  distanceMiles: distanceMiles,
+                  distanceKilometers: distanceKilometers
+                };
+
+                // Serialize the data object to JSON
+                var jsonDataToSend = JSON.stringify(dataToSend);
+                console.log("dataToSend");
+                // Make an AJAX POST request to your server-side endpoint
+                $.ajax({
+                  type: 'POST', 
+                  url: '/save_distance', 
+                  contentType: 'application/json', 
+                  data: jsonDataToSend, 
+                  success: function (response) {
+                    // Handle the response from the server if needed
+                    console.log('Data sent successfully:', response);
+                  },
+                  error: function (error) {
+                    // Handle any errors that occur during the AJAX request
+                    console.error('Error sending data:', error);
+                  }
+                });
+
+                markerDistancesElement.appendChild(legElement);
+                console.log("Leg " + i + " - Miles:", distanceMiles); 
+                console.log("Leg " + i + " - Kilometers:", distanceKilometers); 
+              }
+            }
+          });
+        }
+      }
+
+      // Event listener for the provider select element and date input
+      $('#providerid, #daterange').on('change', function () {
+        var selectedProvider = $('#providerid').val();
+        var selectedDate = $('#daterange').val();
+
+        // Hide all markers
+        markers.forEach(function (marker) {
+          marker.setMap(null);
+        });
+
+        // Show markers for the selected provider and date
+        markers.forEach(function (marker) {
+          if ((marker.providerName === selectedProvider || selectedProvider === 'select') &&
+            (!selectedDate || marker.date === selectedDate)) {
+            marker.setMap(map);
+          }
+        });
+
+        // Reset displayed route
+        directionsDisplay.setDirections({ routes: [] });
+
+         // Fetch and display trip data for the selected provider
+        fetchPatientTripData(selectedProvider);
+        
+
+        // Calculate and display route between selected markers
+        calculateAndDisplayRoute(selectedProvider, selectedDate);
+      });
+
+      // Display all markers initially
+      markers.forEach(function (marker) {
+        marker.setMap(map);
+      });
+
+      // Get the default selected provider and date
+      var selectedProvider = $('#providerid').val();
+      var selectedDate = $('#daterange').val();
+
+      // Calculate and display route for the default selected provider and date
+      calculateAndDisplayRoute(selectedProvider, selectedDate);
+
+    }
+
+
+  </script>
+
+  <%- include('footer_list.html') %>

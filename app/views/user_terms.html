@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms and Conditions</title>
+    <style>
+        /* Basic styling */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+        }
+
+        /* Responsive content container */
+        .terms-container {
+            max-width: 800px; /* Limit content width for readability */
+            margin: 0 auto;
+            padding: 20px;
+            text-align: justify;
+	    font-size: 20px; /* Set font size to 20px */
+        }
+
+        /* Center any image within the terms-container */
+        .terms-container img {
+            display: block;
+            margin: 0 auto 20px; /* Center image and add space below */
+            max-width: 100%; /* Responsive image */
+            height: auto;
+        }
+
+        /* Adjustments for small screens */
+        @media (max-width: 600px) {
+            .terms-container {
+                padding: 10px;
+                font-size: small;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Content container for terms and conditions -->
+    <div class="terms-container">
+        <%- setting_data %>
+    </div>
+
+    <!-- JavaScript to remove inline styles for responsiveness -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const termsContainer = document.querySelector('.terms-container');
+            if (termsContainer) {
+                termsContainer.querySelectorAll('*').forEach(el => el.removeAttribute('style'));
+            }
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,110 @@
+<%- include ('header.html') %>
+<div class="row">
+    <div class="col-md-12">
+        <!-- START SIMPLE DATATABLE -->
+        <div class="panel panel-default">
+
+                <div class="panel-body">                                
+                    <div class="table-responsive">
+                      <br>
+                      <table class="table" id="data_table">
+
+                        <thead>
+                            <tr>
+
+                              <th scope="col">Device Name <a
+                                href="javascript:sort(true, 'DeviceName', 'data_table');"></a> <a
+                                href="javascript:sort(false, 'DeviceName', 'data_table');"></a></th>
+                              <th scope="col">Nick Name <a
+                                href="javascript:sort(true, 'NickName', 'data_table');"></a> <a
+                                href="javascript:sort(false, 'NickName', 'data_table');"></a></th>
+                              <th scope="col">DeviceIdentifier <a
+                                href="javascript:sort(true, 'DeviceIdentifier', 'data_table');"></a> <a
+                                href="javascript:sort(false, 'DeviceIdentifier', 'data_table');"></a></th>
+                              <th scope="col">ProviderID <a
+                                href="javascript:sort(true, 'ProviderID', 'data_table');"></a> <a
+                                href="javascript:sort(false, 'ProviderID', 'data_table');"></a></th>
+                              <th scope="col">ASSET STATUS <a
+                                href="javascript:sort(true, 'AssetStatus', 'data_table');"></a> <a
+                                href="javascript:sort(false, 'AssetStatus', 'data_table');"></a></th>
+                              <th scope="col"> DEVICE STATUS <a
+                                href="javascript:sort(true, 'DeviceStatus', 'data_table');"></a> <a
+                                href="javascript:sort(false, 'DeviceStatus', 'data_table');"></a></th>
+                              <th scope="col"> TYPE <a
+                                href="javascript:sort(true, 'Type', 'data_table');"></a> <a
+                                href="javascript:sort(false, 'Type', 'data_table);"></a></th>
+                              <th scope="col"> MANUFACTURER <a
+                                href="javascript:sort(true, 'Manufacturer', 'data_table');"></a> <a
+                                href="javascript:sort(false, 'Manufacturer', 'data_table');"></a></th>
+                              <th scope="col"> MODEL <a
+                                href="javascript:sort(true, 'Model', 'data_table');"></a> <a
+                                href="javascript:sort(false, 'Model', 'data_table');"></a></th>
+                              <th scope="col"> CREATED BY <a
+                                href="javascript:sort(true, 'CreatedBy', 'data_table');"></a> <a
+                                href="javascript:sort(false, 'CreatedBy', 'data_table');"></a></th>
+                              <th scope="col"> ACTION <a
+                                href="javascript:sort(true, 'CreatedBy', 'data_table');"></a> <a
+                                href="javascript:sort(false, 'CreatedBy', 'data_table');"></a></th>
+                           
+                            </tr>
+                          </thead>
+                         
+                       
+                         
+                         
+
+                      
+  <% if(data.length){
+ 
+    for(var i = data.length-1; i> -1; i--) {%>  
+        <tr>
+          <td class="DeviceName"><%= data[i].DeviceName%></td>
+          <td class="NickName"><%= data[i].NickName%></td>
+          <td class="DeviceIdentifier"><%= data[i].DeviceIdentifier%> </td>
+          <td class="ProviderID"><%= data[i].ProviderID%> </td>
+          <td class="AssetStatus"><%= data[i].AssetStatus%> </td>
+          <td class="DeviceStatus"><%= data[i].DeviceStatus%> </td>
+          <td class="Type"><%= data[i].Type%></td>
+          <td class="Manufacturer"><%= data[i].Manufacturer%> </td>
+          <td class="Model"><%= data[i].Model%> </td>
+          <td class="CreatedBy"><%= data[i].CreatedBy%></td>
+          <td>
+                                <div class="btn-group" style="margin-right:15px;">
+                                    <a href="#" data-toggle="dropdown" class="btn btn-primary dropdown-toggle"><%= config_json.button_action %>
+                                        <span class="caret"></span>
+                                    </a>
+                                    <ul class="dropdown-menu" role="menu">
+                                                                                                                                
+                                        <a href="/assetreadings">        
+                                        <button type="submit" class="btn btn-default" style="width:100%;"><%= config_json.button_view_detail %>
+                                                </button>
+                                        
+
+                                    </div>
+                                </ul>
+                            </div>
+                        </td>
+        </tr>
+        <% }
+           
+   }else{ %>
+       <tr>
+          <td colspan="3">No data</td>
+       </tr>
+    <% } %>    
+  
+</tbody>
+            </table>
+        </div>
+    </div>        
+</div>
+<!-- END SIMPLE DATATABLE -->
+
+</div>
+</div>                                
+
+</div>
+<script type="text/javascript">
+
+</script>   
+<%- include ('footer_list.html') %> 

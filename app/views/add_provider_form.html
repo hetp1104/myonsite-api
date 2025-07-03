@@ -1,0 +1,323 @@
+<%- include('header.html') %>
+    <!-- PAGE CONTENT WRAPPER -->
+    <div class="page-content-wrap">
+        <div class="row">
+            <div class="col-md-12">
+
+
+                <!-- ///////////////////////////// -->
+
+                <!-- for add provider form -->
+                <form class="form-horizontal" method="post" action="https://stagingm.myonsitehealthcare.com/add_provider_form"
+                    enctype="multipart/form-data">
+                    <!-- <input type="hidden" name="country_code" class="country_code" value="">
+                <input type="hidden" name="city_locations" id="city_locations"> -->
+                    <div class="panel panel-default tabs">
+                        <ul class="nav nav-tabs" role="tablist">
+                            <li class="active"><a href="#tab-first" role="tab" data-toggle="tab">
+                                    <%= config_json.button_add_provider %>
+                                </a></li>
+                            <!-- <li><a href="#tab-second" role="tab" data-toggle="tab"><%= config_json.button_add_airport %></a></li> -->
+                        </ul>
+                    </div>
+                    <div class="tab-pane active" id="tab-first">
+                        <div class="col-md-6 form-group">
+                            <!-- <div class="form-group">
+                                    <label class="col-md-3 col-xs-5 control-label"><%= config_json.title_country %></label>
+
+                                    <div class="col-md-9 col-xs-7">
+                                        <div class="col-md-9">
+                                            <select class="form-control select" data-live-search="true" name="countryid" id="countryid">
+                                                <option selected disabled hidden style='display: none'>Select country...</option>
+                                                <% country_data.forEach(function(data) { %>
+
+                                                <option value="<%= data.id %>"><%= data.countryname %></option>
+                                                <% }); %>
+                                            </select>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <input type="hidden" class="form-control" name="full_cityname" id="full_cityname" />
+                                
+
+                                <div class="form-group">
+                                    <label class="col-md-3 col-xs-5 control-label"><%= config_json.title_city %></label>
+                                    <div class="col-md-9 col-xs-7">
+                                        <div class="col-md-9">
+
+                                            <input type="text" class="form-control" name="cityname" onkeyup="test()" id="cityname" />
+                                            <div id="citycheck"></div>
+                                        </div>
+
+                                    </div>
+                                </div> -->
+
+                            <div class="form-group">
+                                <label class="col-md-3 col-xs-5 control-label">
+                                    <%= config_json.title_first_name %>
+                                </label>
+
+                                <div class="col-md-9 col-xs-7">
+                                    <div class="col-md-9">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" name="first_name" />
+
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+
+                            <div class="form-group">
+                                <label class="col-md-3 col-xs-5 control-label">
+                                    <%= config_json.title_last_name %>
+                                </label>
+
+                                <div class="col-md-9 col-xs-7">
+                                    <div class="col-md-9">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control" name="last_name" />
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-md-3 col-xs-5 control-label">
+                                    <%= config_json.title_email %>
+                                </label>
+
+                                <div class="col-md-9 col-xs-7">
+                                    <div class="col-md-9">
+
+                                        <input type="text" class="form-control" name="email" id='email' />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-md-3 col-xs-5 control-label">
+                                    <%= config_json.title_device_type %>
+                                </label>
+                                <div class="col-md-9 col-xs-7">
+                                    <div class="col-md-9">
+                                        <!-- Use a select dropdown for device type -->
+                                        <select class="form-control" name="device_type" id="device_type">
+                                            <option value="android">Android</option>
+                                            <option value="ios">iOS</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="col-md-3 col-xs-5 control-label">
+                                    <%= config_json.title_phone %>
+                                </label>
+                                <div class="col-md-9 col-xs-7">
+                                    <div class="col-md-3">
+                                        <!-- Create a select dropdown for country phone code -->
+                                        <select class="form-control" name="country_phone_code" id="country_phone_code">
+                                            <!-- Assuming you have a list of country phone codes available -->
+                                            <option value="+1">+1</option>
+                                            <!-- <option value="+91">+91</option> -->
+                                            <!-- Add other country codes as needed -->
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- <div class="form-group">
+                                <label class="col-md-3 col-xs-5 control-label">
+                                    <%= config_json.title_country %>
+                                </label>
+
+                                <div class="col-md-9 col-xs-7">
+                                    <div class="col-md-9">
+                                        <select class="form-control select" data-live-search="true" name="countryid"
+                                            id="countryid">
+                                            <option selected disabled hidden style='display: none'>Select country...
+                                            </option>
+                                            <% country_data.forEach(function(data) { %>
+
+                                                <option value="<%= data.id %>">
+                                                    <%= data.countryname %>
+                                                </option>
+                                                <% }); %>
+                                        </select>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <input type="hidden" class="form-control" name="full_cityname" id="full_cityname" />
+
+
+                            <div class="form-group">
+                                <label class="col-md-3 col-xs-5 control-label">
+                                    <%= config_json.title_city %>
+                                </label>
+                                <div class="col-md-9 col-xs-7">
+                                    <div class="col-md-9">
+
+                                        <input type="text" class="form-control" name="city" onkeyup="test()"
+                                            id="cityname" />
+                                        <div id="citycheck"></div>
+                                    </div>
+
+                                </div>
+                            </div> -->
+
+                            <div class="form-group">
+                                <label class="col-md-3 col-xs-5 control-label">
+                                    <%= config_json.title_phone %>
+                                </label>
+                                <div class="col-md-9 col-xs-7">
+                                    <div class="col-md-9">
+                                        <input type="text" class="form-control" name="phone" />
+                                        <!-- Add name attribute here -->
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+            </div>
+
+            <div class="panel-footer">
+                <button id="submit" type="submit" name="submit" value="submit" class="btn btn-primary btn-block"
+                    style="text-align:center;width:80px;margin: 0 auto;">
+                    <%= config_json.button_submit %>
+                </button>
+            </div>
+        </div>
+        </form>
+
+    </div>
+    </div>
+    </div>
+    <!-- <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBR-snPbcy9lm-8pQ6SdGPOyx2GDwt5nw0&libraries=places"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#cityid").attr("disabled", true);
+            $("#providerid").attr("disabled", true);
+
+            $('#countryid').change(function () {
+                $("#cityid").attr("disabled", false);
+                $("#providerid").attr("disabled", true);
+                $('#cityid').empty();
+                $('#providerid').empty();
+                var countryid = document.getElementById('countryid').value;
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/fetch_city_list',
+                    data: 'countryid=' + countryid,
+                    dataType: "json",
+                    success: function (res) {
+                        //var res =  JSON.stringify(res);
+                        $("#cityid").append("<option selected disabled hidden style='display: none'>Select City...</option>");
+                        for (var index in res) {
+                            var city_name = res[index].cityname;
+                            var city_id = res[index]._id;
+                            $("#cityid").append("<option value=" + city_id + ">" + city_name + "</option>");
+                        }
+                        $('#cityid').selectpicker('refresh');
+                        $('#providerid').selectpicker('refresh');
+                    }
+                });
+            });
+
+            $('#clear').click(function () {
+
+                $('#cityid').empty();
+                $("#cityid").attr("disabled", true);
+                $('#cityid').selectpicker('refresh');
+
+                $('#countryid').val($(this).attr('alt'));
+                $('#countryid').selectpicker('refresh');
+
+            });
+
+        });
+        ///////////// for autocomplete city name //////////////
+
+        $("#countryid").change(function () {
+
+            test();
+            var country = document.getElementById('countryid').value;
+            
+            $.ajax({
+                type: 'POST',
+                url: '/autocomplete_cityname',
+
+                data: 'country=' + country,
+                dataType: "json",
+                success: function (res) {
+
+                    var options = {
+                        types: ['(cities)'],
+                        componentRestrictions: { country: res.country_code }
+                    };
+                    var input = document.getElementById('cityname');
+                    var autocomplete = new google.maps.places.Autocomplete(input, options);
+                    /////////////// autocomplete city list select ///////////
+                    autocomplete.addListener('place_changed', function () {
+                        var place = autocomplete.getPlace();
+
+                        var location = place.geometry.location;
+                        location = String(location);
+                        location = location.slice(1, -1);
+                        location = location.split(',');
+
+                        for (var i = 0; i < place.address_components.length; i++) {
+
+                            if (place.address_components[i].types[0] == "administrative_area_level_1") {
+                                //this is the object you are looking for
+                                subAdminCity = place.address_components[i];
+                                subAdminCity = subAdminCity.long_name;
+                                document.getElementById('cityname').value = place.name + ', ' + subAdminCity;
+
+                            }
+                        }
+
+                        document.getElementById('full_cityname').value = place.name;
+                        document.getElementById('latitude').value = location[0];
+                        document.getElementById('longitude').value = location[1];
+                        var initialLocation = new google.maps.LatLng(location[0], location[1]);
+                        city_radius_map.setCenter(initialLocation);
+                        test();
+                    });
+                }
+            });
+        });
+        ///////////// for check selected country city already exist or not /////////////
+        function test() {
+            var city = document.getElementById('cityname').value;
+
+            var country = document.getElementById('countryid').value;
+
+            $("#submit").attr("disabled", true);
+            $.ajax({
+                type: 'POST',
+                url: '/check_city_available',
+                data: { 'cityname': city, 'countryid': country },
+                dataType: "json",
+                success: function (res) {
+
+                    if (res == 1) {
+                        $("#submit").attr("disabled", true);
+
+                        $("#citycheck").html('<font color="red">City Name Already Used</font>');
+                    } else {
+                        $("#citycheck").html('');
+
+                        $("#submit").attr("disabled", false);
+                    }
+                }
+            });
+        }      
+    </script> -->
+    <%- include('footer_form.html') %>

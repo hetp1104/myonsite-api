@@ -1,0 +1,250 @@
+<%- include('header.html') %>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+
+<!-- PAGE CONTENT WRAPPER -->
+<script type="text/javascript">
+  function filterTable() {
+  // Variables
+  let dropdown, table, rows, cells, country, filter;
+  dropdown = document.getElementById("filter-dropdown");
+  table = document.getElementById("data_table");
+  rows = table.getElementsByTagName("tr");
+  filter = dropdown.value;
+            
+  // Loops through rows and hides those with countries that don't match the filter
+  for (let row of rows) { // `for...of` loops through the NodeList
+    cells = row.getElementsByTagName("td");
+    // alert(filter);
+    country = cells[0] || null; // gets the 2nd `td` or nothing
+    // if the filter is set to 'All', or this is the header row, or 2nd `td` text matches filter
+    if (filter === "All" || !country || (filter === country.textContent)) {
+    row.style.display = ""; // shows this row
+    }
+    else {
+    row.style.display = "none"; // hides this row
+    }
+  }
+}
+</script>
+
+
+
+<!-- PAGE CONTENT WRAPPER -->
+<div class="page-content-wrap">
+
+ <!-- START TIMELINE FILTER --> 
+ <div class="panel panel-default">
+   <div class="panel-body">
+     
+      
+       <div class="form-group">
+         <input type="hidden" name="page" id="page" value="0" />   
+
+
+          
+        <div class="col-md-4">
+        <div style="text-align: center;">
+          <label><%= config_json.title_readingtype %></label>   
+        </div>
+        <div class="col-md-6">
+          <div class="input-group">
+            <span class="input-group-addon"><span class="glyphicon glyphicon-sort"></span></span>
+            <select class="form-control select" id="filter-dropdown" placeholder="Select to Sort" name="sort_item" onchange="filterTable()">
+              <option selected="selected"><%= config_json.title_temperature %></option>
+              <option><%= config_json.title_location %></option>
+          </select>
+          </div>
+        </div>
+        <div class="col-md-12">
+          <div class="col-md-12">
+
+            <div class="btn-group">
+              <div class="input-group">  
+                <button id="prev"><</button>
+                <span id="date" style="margin:0px 10px;"></span>
+               <button id="next">></button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        
+      
+       
+      
+        
+      </div>
+   
+
+</div>
+</div>
+</div>
+</div> 
+<!-- END TIMELINE FILTER -->  
+
+
+
+<div class="row">
+    <div class="col-md-12">
+        <!-- START SIMPLE DATATABLE -->
+        <div class="panel panel-default">
+
+                <div class="panel-body">                                
+                    <div class="table-responsive">
+                      <br>
+                      <table class="table" id="data_table">
+
+                          <thead>
+                            <tr>
+                              <th scope="col">Reading Type <div class="col-md-6">
+                                <div class="input-group">
+                                </div> <a
+                                href="javascript:sort(true, 'readingtpe', 'data_table');"></a> <a
+                                href="javascript:sort(false, 'readingtpe', 'data_table');"></a></th>
+                              <th scope="col">Reading Date & Time <a
+                                href="javascript:sort(true, 'readingdtm', 'data_table');">&#9660;</a> <a
+                                href="javascript:sort(false, 'readingdtm', 'data_table');">&#9650;</a></th>
+                              <th scope="col">Left Current Temperature / LATITUDE <a
+                                href="javascript:sort(true, 'leftcurrent', 'data_table');"></a> <a
+                                href="javascript:sort(false, 'leftcurrent', 'data_table');"></a></th>
+                              <th scope="col">Left Temperature Max / LONGTITUDE <a
+                                href="javascript:sort(true, 'lefttempmax', 'data_table');"></a> <a
+                                href="javascript:sort(false, 'lefttempmax', 'data_table');"></a></th>
+                              <th scope="col">Left Temperature Min <a
+                                href="javascript:sort(true, 'lefttempmin', 'data_table');"></a> <a
+                                href="javascript:sort(false, 'lefttempmin', 'data_table');"></a></th>
+                              <th scope="col">Left Target Temperature <a
+                                href="javascript:sort(true, 'lefttemptarget', 'data_table');"></a> <a
+                                href="javascript:sort(false, 'lefttemptarget', 'data_table');"></a></th>
+                              <th scope="col">Right Current Temperature <a
+                                href="javascript:sort(true, 'rightcurrent', 'data_table');"></a> <a
+                                href="javascript:sort(false, 'rightcurrent', 'data_table);"></a></th>
+                              <th scope="col">Right Temperature Max <a
+                                href="javascript:sort(true, 'righttempmax', 'data_table');"></a> <a
+                                href="javascript:sort(false, 'righttempmax', 'data_table');"></a></th>
+                              <th scope="col">Right Temperature Min <a
+                                href="javascript:sort(true, 'righttempmin', 'data_table');"></a> <a
+                                href="javascript:sort(false, 'righttempmin', 'data_table');"></a></th>
+                              <th scope="col">Right Target Temperature <a
+                                href="javascript:sort(true, 'righttemptarget', 'data_table');"></a> <a
+                                href="javascript:sort(false, 'righttemptarget', 'data_table');"></a></th>
+                                <th>
+                                  <%= config_json.button_action %>
+                              </th>
+                                
+                           
+                            </tr>
+                          </thead>                                                                                                                       
+  <% if(data.length){ 
+    for(var i = data.length-1; i> -1; i--) {
+      if(data[i].ReadingType == "TEMP"){ %> 
+
+  <tr>
+    <td class="readingtpe"><%= data[i].ReadingType%></td>
+    <td class="readingdtm"><%= data[i].UpdatedwhenDtm.toISOString().replace('T', ' ').replace('Z', ' UTC'); %></td>
+    <td class="leftcurrent"><%= data[i].Value1%><b> °C</b></td>
+    <td class="lefttempmax"><%= data[i].value2%> °C</td>
+    <td class="lefttempmin"><%= data[i].value3%> °C</td>
+    <td class="lefttemptarget"><%= data[i].value4%> °C</td>
+    <td class="rightcurrent"><%= data[i].value5%><b> °C</b></td>
+    <td class="righttempmax"><%= data[i].value6%> °C</td>
+    <td class="righttempmin"><%= data[i].value7%> °C</td>
+    <td class="righttemptarget"><%= data[i].value8%> °C</td>
+    <td>
+      <div class="btn-group">
+          <a href="#" data-toggle="dropdown" class="btn btn-primary dropdown-toggle">
+              <%= config_json.button_action %> <span class="caret"></span></a>
+          <ul class="dropdown-menu" role="menu">
+              <li>
+                  <form method="get" action="/asset_readings_edit">
+                      
+                      <button type="submit" class="btn btn-default" style="width:100%;"><%= config_json.title_edit_detail %></button>
+                  </form>
+              </li>
+                %>
+      
+          </ul>
+      </div>
+  </td>
+  </tr>
+  <% }  else{ %> 
+  <tr>
+    <td class="readingtpe"><%= data[i].ReadingType%></td>
+    <td class="readingdtm"><%= data[i].UpdatedwhenDtm.toISOString().replace('T', ' ').replace('Z', ' UTC'); %></td>
+    <td class="leftcurrent"><%= data[i].Value1%><b> °</b></td>
+    <td class="lefttempmax"><%= data[i].value2%> °</td>
+    <td class="lefttempmin"><%= data[i].value3%></td>
+    <td class="lefttemptarget"><%= data[i].value4%></td>
+    <td class="rightcurrent"><%= data[i].value5%><b></b></td>
+    <td class="righttempmax"><%= data[i].value6%></td>
+    <td class="righttempmin"><%= data[i].value7%></td>
+    <td class="righttemptarget"><%= data[i].value8%></td>
+    <td>
+      <div class="btn-group">
+          <a href="#" data-toggle="dropdown" class="btn btn-primary dropdown-toggle">
+              <%= config_json.button_action %> <span class="caret"></span></a>
+          <ul class="dropdown-menu" role="menu">
+              <li>
+                <a href="/asset_readings_edit"> 
+                      <input type="hidden" name="id" value="<%= data._id %>" />
+
+                      <button type="submit" class="btn btn-default" style="width:100%;"><%= config_json.title_edit_detail %></button>
+                  
+              </li>
+                %>
+      
+          </ul>
+      </div>
+  </td>
+  </tr>
+
+  <% }}} else{ %> 
+       <tr>
+          <td colspan="3">No data</td>
+       </tr>
+       <% } %>   
+  
+</tbody>
+        </div>
+    </div>        
+</div>
+</div>
+</div>                                    
+<script type="text/javascript">
+
+if (!Date.now) {
+        Date.now = function() {
+       return new Date().getTime();
+        }
+     }
+     var theDate = Date.now();
+
+     document.getElementById('date').innerText = getTheDate(theDate)
+
+     document.getElementById('prev').addEventListener("click", function() {
+      theDate -= 86400000;
+     document.getElementById('date').innerText = getTheDate(theDate)
+   })
+     document.getElementById('next').addEventListener("click", function() {
+    theDate += 86400000;
+      document.getElementById('date').innerText = getTheDate(theDate)
+  })
+
+     function getTheDate(getDate) {
+       var days = ["Sunday", "Monday", "Tuesday",
+           "Wednesday", "Thursday", "Friday", "Saturday"
+      ];
+        var months = ["January", "February", "March",
+         "April", "May", "June", "July", "August",
+         "September", "October", "November", "December"
+      ];
+         var theCDate = new Date(getDate);
+          return days[theCDate.getDay()] + ', ' + theCDate.getDate() + '-' + 
+         months[theCDate.getMonth()] + '-' + theCDate.getFullYear();
+      } 
+
+
+
+  </script>
+<%- include('footer_list.html') %> 

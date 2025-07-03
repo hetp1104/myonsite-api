@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="refresh" content="5">
+  <title>Assets Data</title>
+  <link rel='stylesheet' href='/stylesheets/style.css' />
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+
+<style>
+  th{
+    font-weight: normal;
+}
+tr{
+  font-weight: bold;
+}
+</style>
+
+<script type="text/javascript">
+  function sort(ascending, columnClassName, tableId) {
+      var tbody = document.getElementById(tableId).getElementsByTagName(
+              "tbody")[0];
+      var rows = tbody.getElementsByTagName("tr");
+
+      var unsorted = true;
+
+      while (unsorted) {
+          unsorted = false
+
+          for (var r = 0; r < rows.length - 1; r++) {
+              var row = rows[r];
+              var nextRow = rows[r + 1];
+
+              var value = row.getElementsByClassName(columnClassName)[0].innerHTML;
+              var nextValue = nextRow.getElementsByClassName(columnClassName)[0].innerHTML;
+
+              value = value.replace(',', '.'); // in case a comma is used in float number
+              nextValue = nextValue.replace(',', '.');
+
+              if (!isNaN(value)) {
+                  value = parseFloat(value);
+                  nextValue = parseFloat(nextValue);
+              }
+
+              if (ascending ? value > nextValue : value < nextValue) {
+                  tbody.insertBefore(nextRow, row);
+                  unsorted = true;
+              }
+          }
+      }
+  };
+</script>
+</head>
+<body>
+  <div>
+    <a href="/assetreadings" class="btn btn-info ml-3">Asset Data</a>
+</div>    
+<br>
+  <table class="table" id="data_table">
+<thead>
+  <tr>
+    <th scope="col"># <a
+      href="javascript:sort(true, 'id', 'data_table');">&#9660;</a> <a
+      href="javascript:sort(false, 'id', 'data_table');">&#9650;</a></th>
+    <th scope="col">Device Name <a
+      href="javascript:sort(true, 'DeviceName', 'data_table');">&#9660;</a> <a
+      href="javascript:sort(false, 'DeviceName', 'data_table');">&#9650;</a></th>
+    <th scope="col">Reading Date & Time <a
+      href="javascript:sort(true, 'NickName', 'data_table');">&#9660;</a> <a
+      href="javascript:sort(false, 'NickName', 'data_table');">&#9650;</a></th>
+    <th scope="col">Left Current Temperature <a
+      href="javascript:sort(true, 'DeviceIdentifier', 'data_table');">&#9660;</a> <a
+      href="javascript:sort(false, 'DeviceIdentifier', 'data_table');">&#9650;</a></th>
+    <th scope="col">Left Temperature Max <a
+      href="javascript:sort(true, 'ProviderID', 'data_table');">&#9660;</a> <a
+      href="javascript:sort(false, 'ProviderID', 'data_table');">&#9650;</a></th>
+    <th scope="col">Left Temperature Min <a
+      href="javascript:sort(true, 'AssetStatus', 'data_table');">&#9660;</a> <a
+      href="javascript:sort(false, 'AssetStatus', 'data_table');">&#9650;</a></th>
+    <th scope="col">Left Target Temperature <a
+      href="javascript:sort(true, 'DeviceStatus', 'data_table');">&#9660;</a> <a
+      href="javascript:sort(false, 'DeviceStatus', 'data_table');">&#9650;</a></th>
+    <th scope="col">Right Current Temperature <a
+      href="javascript:sort(true, 'Type', 'data_table');">&#9660;</a> <a
+      href="javascript:sort(false, 'Type', 'data_table);">&#9650;</a></th>
+    <th scope="col">Right Temperature Max <a
+      href="javascript:sort(true, 'Manufacturer', 'data_table');">&#9660;</a> <a
+      href="javascript:sort(false, 'Manufacturer', 'data_table');">&#9650;</a></th>
+    <th scope="col">Right Temperature Min <a
+      href="javascript:sort(true, 'Model', 'data_table');">&#9660;</a> <a
+      href="javascript:sort(false, 'Model', 'data_table');">&#9650;</a></th>
+    <th scope="col">Right Target Temperature <a
+      href="javascript:sort(true, 'CreatedBy', 'data_table');">&#9660;</a> <a
+      href="javascript:sort(false, 'CreatedBy', 'data_table');">&#9650;</a></th>
+ 
+  </tr>
+</thead>
+<tbody>
+  <% if(data.length){
+ 
+  for(var i = data.length-1; i> -1; i--) {%>  
+  <tr>
+    <th class="id" scope="row"><%= (data.length-i) %></th>
+    <td class="DeviceName"><%= data[i].DeviceName%></td>
+    <td class="NickName"><%= data[i].NickName%></td>
+    <td class="DeviceIdentifier"><%= data[i].DeviceIdentifier%> </td>
+    <td class="ProviderID"><%= data[i].ProviderID%> </td>
+    <td class="AssetStatus"><%= data[i].AssetStatus%> </td>
+    <td class="DeviceStatus"><%= data[i].DeviceStatus%> </td>
+    <td class="Type"><%= data[i].Type%></td>
+    <td class="Manufacturer"><%= data[i].Manufacturer%> </td>
+    <td class="Model"><%= data[i].Model%> </td>
+    <td class="CreatedBy"><%= data[i].CreatedBy%></td>
+  </tr>
+  <% }
+           
+   }else{ %>
+       <tr>
+          <td colspan="3">No data</td>
+       </tr>
+    <% } %>    
+  
+</tbody>
+</table>
+</body>
+</html>

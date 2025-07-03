@@ -1,0 +1,412 @@
+<%- include('header.html') %>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+
+<!-- PAGE CONTENT WRAPPER -->
+
+<script type="text/javascript">
+  function filterTable() {
+  // Variables
+  let dropdown, table, rows, cells, country, filter, date, current;
+  dropdown = document.getElementById("date");
+  date = dropdown.innerText;
+  dropdown = document.getElementById("filter-dropdown");
+  table = document.getElementById("data_table");
+  rows = table.getElementsByTagName("tr");
+  filter = dropdown.value;
+  let searchValue = document.getElementById("search").value.toLowerCase();
+
+  // Loops through rows and hides those with countries that don't match the filter
+  for (let row of rows) { // `for...of` loops through the NodeList
+    cells = row.getElementsByTagName("td");
+    country = cells[0] || null; // gets the 2nd `td` or nothing
+    provider = cells[11] ? cells[11].textContent.toLowerCase() : null;
+    date_data = cells[1] || null; // gets the 2nd `td` or nothing
+        // Check if any cell contains the search query
+        let rowContainsSearch = Array.from(cells).some(cell => {
+      return cell.textContent.toLowerCase().includes(searchValue);
+    });
+
+    if (
+      (filter === "All" || !country || ((filter === country.textContent) && (date_data.textContent.includes(date)))) &&
+      (provider === null || provider.includes(searchValue)) &&
+      rowContainsSearch
+    ) {
+      row.style.display = ""; // shows this row
+    } else {
+      row.style.display = "none"; // hides this row
+    }
+
+    if (filter === "TEMP")
+    {
+      current = cells[2] || null
+      max = cells[3] || null
+      min = cells[4] || null
+
+      if(current != null)
+      {
+        text = current.textContent.replace('°', '');
+        if(text.includes('C'))
+        {
+          text = text.replace('C', '');
+        }
+        current = parseInt(text);
+      // console.log(typeof(text));
+      }
+      if(current != null)
+      {
+        text = max.textContent.replace('°', '');
+        if(text.includes('C'))
+        {
+          text = text.replace('C', '');
+        }
+        max = parseInt(text);
+      // console.log(typeof(text));
+      }
+      if(current != null)
+      {
+        text = min.textContent.replace('°', '');
+        if(text.includes('C'))
+        {
+          text = text.replace('C', '');
+        }
+        min = parseInt(text);
+      // console.log(typeof(text));
+      }
+      // console.log(current)
+      // console.log(max);
+      // console.log(min);
+      
+      if(current > max || current < min)
+      {
+        // console.log("red");
+        cells[2].style.color = "#ff0000";
+      }
+      else{
+        // cells[2].style.color = "#656C78";
+      }
+      
+      current = cells[6] || null
+      max = cells[7] || null
+      min = cells[8] || null
+
+      if(current != null)
+      {
+        text = current.textContent.replace('°', '');
+        if(text.includes('C'))
+        {
+          text = text.replace('C', '');
+        }
+        current = parseInt(text);
+      // console.log(typeof(text));
+      }
+      if(max != null)
+      {
+        text = max.textContent.replace('°', '');
+        if(text.includes('C'))
+        {
+          text = text.replace('C', '');
+        }
+        max = parseInt(text);
+      // console.log(typeof(text));
+      }
+      if(min != null)
+      {
+        text = min.textContent.replace('°', '');
+        if(text.includes('C'))
+        {
+          text = text.replace('C', '');
+        }
+        min = parseInt(text);
+      // console.log(typeof(text));
+      }
+      // console.log(current)
+      // console.log(max);
+      // console.log(min);
+      
+      if(current > max || current < min)
+      {
+        console.log(filter)
+        cells[6].style.color = "#ff0000";
+      }
+    }
+    else
+    {
+      current = cells[2] || null
+      max = cells[3] || null
+      min = cells[4] || null
+      if(current != null)
+      {
+        cells[2].style.color = "#656C78";
+      }
+    }
+  }
+  if (filter == "TEMP"){
+    document.getElementById("1").textContent = "Left Current Temperature";
+    document.getElementById("2").textContent = "Left Temperature Max ";
+    document.getElementById("3").textContent = "Left Temperature Min";
+    document.getElementById("4").textContent = "Left Target Temperature";
+    document.getElementById("5").textContent = "Right Current Temperature";
+    document.getElementById("6").textContent = "Right Temperature Max";
+    document.getElementById("7").textContent = "Right Temperature Min";
+    document.getElementById("8").textContent = "Right Target Temperature";
+    document.getElementById("10").textContent = "";
+  }
+  else{
+    document.getElementById("1").textContent = "LATITUDE";
+    document.getElementById("2").textContent = "LONGITUDE";
+    document.getElementById("3").textContent = "";
+    document.getElementById("4").textContent = "";
+    document.getElementById("5").textContent = "";
+    document.getElementById("6").textContent = "";
+    document.getElementById("7").textContent = "";
+    document.getElementById("8").textContent = "";
+    document.getElementById("10").textContent = "Address"
+  }
+}
+</script>
+<!-- PAGE CONTENT WRAPPER -->
+<div class="page-content-wrap">
+
+ <!-- START TIMELINE FILTER --> 
+ <div class="panel panel-default">
+   <div class="panel-body">
+       <div class="form-group">
+         <input type="hidden" name="page" id="page" value="0" />   
+        <div class="col-md-2">
+          <div class="input-group">
+            <span class="input-group-addon"><span class="glyphicon glyphicon-sort"></span></span>
+            <select class="form-control select" id="filter-dropdown" placeholder="Select to Sort" name="sort_item" onchange="filterTable()">
+              <option selected="selected"><%= config_json.title_temperature %></option>
+              <option><%= config_json.title_location %></option>
+            </select>
+          </div>
+        </div>
+         
+        <div class="col-md-4">
+          <div>
+           <div class="col-md-6">
+             <div class="btn-group">
+               <div class="input-group">  
+                 <button id="prev"><</button>
+                 <b><span id="date" style="margin:0px 10px;"></span></b>
+                <button id="next">></button>
+               </div>           
+            </div>
+          </div>
+         </div>
+
+        <div class="col-md-6">
+          <div class="panel panel-default">
+            <div class="panel-body panel-body-search">
+              <div class="input-group">
+                <span class="input-group-addon"><span class="fa fa-search"></span></span>
+                <!-- <input type="text" class="form-control" name="search_value" id="search" placeholder="Search..." onkeyup="filterTable();"/> -->
+                <input type="text" class="form-control" id="search" placeholder="Search..." onkeyup="filterTable();" />
+              </div>                                                                
+            </div>
+          </div>
+        </div>
+        
+
+
+
+
+      </div>
+    </div>
+  </div>
+ </div>
+</div> 
+<!-- END TIMELINE FILTER -->  
+
+
+
+<div class="row">
+    <div class="col-md-14">
+        <!-- START SIMPLE DATATABLE -->
+        <div class="panel panel-default">
+
+                <div class="panel-body">                                
+                    <div class="table-responsive">
+                      <br>
+                      <table class="table" id="data_table">
+                          <thead>
+                            <tr>
+                              <th scope="col">Reading Type <div class="col-md-0">
+                                <div class="input-group">
+                                </div> <a
+                                href="javascript:sort(true, 'readingtpe', 'data_table');"></a> <a
+                                href="javascript:sort(false, 'readingtpe', 'data_table');"></a></th>
+                              <th scope="col">Reading Time <a
+                                href="javascript:sort(true, 'readingdtm', 'data_table');">&#9660;</a> <a
+                                href="javascript:sort(false, 'readingdtm', 'data_table');">&#9650;</a></th>
+                              <th scope="col" id="1">Left Current Temperature / LATITUDE <a
+                                href="javascript:sort(true, 'leftcurrent', 'data_table');"></a> <a
+                                href="javascript:sort(false, 'leftcurrent', 'data_table');"></a></th>
+                              <th scope="col" id="2">Left Temperature Max / LONGTITUDE <a
+                                href="javascript:sort(true, 'lefttempmax', 'data_table');"></a> <a
+                                href="javascript:sort(false, 'lefttempmax', 'data_table');"></a></th>
+                              <th scope="col" id="3">Left Temperature Min <a
+                                href="javascript:sort(true, 'lefttempmin', 'data_table');"></a> <a
+                                href="javascript:sort(false, 'lefttempmin', 'data_table');"></a></th>
+                              <th scope="col" id="4">Left Target Temperature <a
+                                href="javascript:sort(true, 'lefttemptarget', 'data_table');"></a> <a
+                                href="javascript:sort(false, 'lefttemptarget', 'data_table');"></a></th>
+                              <th scope="col" id="5">Right Current Temperature <a
+                                href="javascript:sort(true, 'rightcurrent', 'data_table');"></a> <a
+                                href="javascript:sort(false, 'rightcurrent', 'data_table);"></a></th>
+                              <th scope="col" id="6">Right Temperature Max <a
+                                href="javascript:sort(true, 'righttempmax', 'data_table');"></a> <a
+                                href="javascript:sort(false, 'righttempmax', 'data_table');"></a></th>
+                              <th scope="col" id="7">Right Temperature Min <a
+                                href="javascript:sort(true, 'righttempmin', 'data_table');"></a> <a
+                                href="javascript:sort(false, 'righttempmin', 'data_table');"></a></th>
+                              <th scope="col" id="8">Right Target Temperature <a
+                                href="javascript:sort(true, 'righttemptarget', 'data_table');"></a> <a
+                                href="javascript:sort(false, 'righttemptarget', 'data_table');"></a></th>
+                              <th scope="col" id="9">Provider ID <a
+                                href="javascript:sort(true, 'ProviderId', 'data_table');"></a> <a
+                                href="javascript:sort(false, 'ProviderId', 'data_table');"></a></th>
+                              <th scope="col" id="9">Provider Name <a
+                                href="javascript:sort(true, 'ProviderName', 'data_table');"></a> <a
+                                href="javascript:sort(false, 'ProviderName', 'data_table');"></a></th>
+                              <th scope="col" id="10">Address <a
+                                href="javascript:sort(true, 'Address', 'data_table');"></a> <a
+                                href="javascript:sort(false, 'Address', 'data_table');"></a></th>
+                            </tr>
+                          </thead>                                                                                                                       
+   <% if(data.length){ 
+    for(var i = data.length-1; i> -1; i--) {
+      if(data[i].ReadingType == "TEMP"){ %> 
+
+        <tr>
+          <td class="readingtpe"><%= data[i].ReadingType%></td>
+          <td class="readingdtm"><%= data[i].UpdatedwhenDtm.toISOString().replace('T', ' ').replace('Z', ' UTC'); %></td>
+          <td class="leftcurrent"><b><%= data[i].Value1%> °C</b></td>
+          <td class="lefttempmax"><%= data[i].value2%> °C</td>
+          <td class="lefttempmin"><%= data[i].value3%> °C</td>
+          <td class="lefttemptarget"><%= data[i].value4%> °C</td>
+          <%  if(data[i].value5 != ""){ %> 
+          <td class="rightcurrent"><b><%= data[i].value5%> °C</b></td>
+          <td class="righttempmax"><%= data[i].value6%> °C</td>
+          <td class="righttempmin"><%= data[i].value7%> °C</td>
+          <td class="righttemptarget"><%= data[i].value8%> °C</td>
+          <td class="ProviderID"><%= data[i].ProviderID%></td>
+          <td class="ProviderName"><%= data[i].ProviderName%></td>
+          <!-- <td class="Address"><center><%= data[i].Address%> </center></td> -->
+          <% } else {%> 
+            <td class="rightcurrent"><b><%= data[i].value5%> </b></td>
+            <td class="righttempmax"><%= data[i].value6%></td>
+            <td class="righttempmin"><%= data[i].value7%></td>
+            <td class="righttemptarget"><%= data[i].value8%></td>
+            <td class="ProviderID"><%= data[i].ProviderID%></td>
+            <td class="ProviderName"><%= data[i].ProviderName%></td>
+            <!-- <td class="Address"><center><%= data[i].Address%> </center></td> -->
+            <% } %> 
+
+        </tr>
+   <% }  else{ %> 
+    <tr>
+      <td class="readingtpe"><%= data[i].ReadingType%></td>
+      <td class="readingdtm"><%= data[i].UpdatedwhenDtm.toISOString().replace('T', ' ').replace('Z', ' UTC'); %></td>
+      <td class="leftcurrent"><%= data[i].Value1%><b> °</b></td>
+      <td class="lefttempmax"><%= data[i].value2%> °</td>
+      <td class="lefttempmin"><%= data[i].value3%></td>
+      <td class="lefttemptarget"><%= data[i].value4%></td>
+      <td class="rightcurrent"><%= data[i].value5%><b></b></td>
+      <td class="righttempmax"><%= data[i].value6%></td>
+      <td class="righttempmin"><%= data[i].value7%></td>
+      <td class="righttemptarget"><%= data[i].value8%></td>
+      <td class="ProviderID"><%= data[i].ProviderID%> </td>
+      <td class="ProviderName"><%= data[i].ProviderName%></td>
+      <td class="Address"><%= data[i].Address%> </td>
+      
+      
+      
+      
+    </tr>
+
+   <% }}} else{ %> 
+       <tr>
+          <td colspan="3">No data</td>
+       </tr>
+       <% } %>   
+  
+   </tbody>
+        </div>
+    </div>        
+</div>
+</div>
+</div>                                    
+<script type="text/javascript">
+
+function setInputDate(_id){
+    var _dat = document.querySelector(_id);
+    var hoy = new Date(),
+        d = hoy.getDate(),
+        m = hoy.getMonth()+1, 
+        y = hoy.getFullYear(),
+        data;
+
+    if(d < 10){
+        d = "0"+d;
+    };
+    if(m < 10){
+        m = "0"+m;
+    };
+
+    data = y+"-"+m+"-"+d;
+    console.log(data);
+    _dat.value = data;
+};
+
+setInputDate("#dateDefault");
+
+
+
+  </script>
+  <script type="text/javascript">
+
+    if (!Date.now) {
+            Date.now = function() {
+           return new Date().getTime();
+            }
+         }
+         var theDate = Date.now();
+    
+         document.getElementById('date').innerText = getTheDate(theDate);
+                       filterTable();
+    
+         document.getElementById('prev').addEventListener("click", function() {
+          theDate -= 86400000;
+         document.getElementById('date').innerText = getTheDate(theDate);
+                       filterTable();
+       })
+         document.getElementById('next').addEventListener("click", function() {
+        theDate += 86400000;
+          document.getElementById('date').innerText = getTheDate(theDate);
+                        filterTable();
+      })
+    
+         function getTheDate(getDate) {
+           var days = ["Sun", "Mon", "Tue",
+               "Wed", "Thur", "Fri", "Sat"
+          ];
+            var months = ["01", "02", "03",
+             "04", "05", "06", "07", "08",
+             "09", "10", "11", "12"
+          ];
+             var theCDate = new Date(getDate);
+             if(String(theCDate.getDate()).length == 1)
+             {
+              return theCDate.getFullYear() + '-' + months[theCDate.getMonth()] + '-' + '0' + theCDate.getDate();
+             }
+             else{
+              return theCDate.getFullYear() + '-' + months[theCDate.getMonth()] + '-' + theCDate.getDate();
+             }
+          } 
+    
+    
+    
+      </script>
+<%- include('footer_list.html') %> 

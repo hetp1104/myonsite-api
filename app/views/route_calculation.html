@@ -1,0 +1,195 @@
+<%- include ('header.html') %>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Route Details Display</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="mb-4">Route Details</h1>
+        
+        <div class="form-group">
+            <label for="createdBy">Created By:</label>
+            <input type="text" id="createdBy" class="form-control" value="PS7">
+        </div>
+        <div class="form-group">
+            <label for="providerId">Provider ID:</label>
+            <input type="text" id="providerId" class="form-control" value="63beb17a256112296f5edf10">
+        </div>
+        <div class="form-group">
+            <label for="readingDateTime">Enter Reading Date:</label>
+            <input type="date" id="readingDateTime" class="form-control">
+        </div>
+        <button id="fetchDataButton" class="btn btn-primary">Fetch Data</button>
+        
+        <h2 class="mt-5 mb-4">Asset Routes</h2>
+        <div id="assetTotals" class="mb-3">
+            <strong>Total Distance:</strong> <span id="totalAssetDistanceMiles">0</span> Miles, <span id="totalAssetDistanceKilometers">0</span> km<br>
+            <strong>Total Duration:</strong> <span id="totalAssetDuration">0</span>
+        </div>
+        <table class="table table-bordered" id="assetRoutesTable">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Route</th>
+                    <th>Distance (Miles)</th>
+                    <th>Distance (Kilometers)</th>
+                    <th>Duration</th>
+                    <th>Start Address</th>
+                    <th>End Address</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Asset routes data will be populated here -->
+            </tbody>
+        </table>
+
+        <h2 class="mt-5 mb-4">Trip Routes</h2>
+        <div id="tripTotals" class="mb-3">
+            <strong>Total Distance:</strong> <span id="totalTripDistanceMiles">0</span> Miles, <span id="totalTripDistanceKilometers">0</span> km<br>
+            <strong>Total Duration:</strong> <span id="totalTripDuration">0</span>
+        </div>
+        <table class="table table-bordered" id="tripRoutesTable">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Route</th>
+                    <th>Source Address</th>
+                    <th>Destination Address</th>
+                    <th>Distance (Miles)</th>
+                    <th>Distance (Kilometers)</th>
+                    <th>Duration</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Trip routes data will be populated here -->
+            </tbody>
+        </table>
+    </div>
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('#fetchDataButton').click(function() {
+                fetchData();
+            });
+        });
+
+        function fetchData() {
+            const createdBy = $('#createdBy').val();
+            const providerId = $('#providerId').val();
+            const readingDateTime = $('#readingDateTime').val();
+
+            $.ajax({
+                url: '/getAssetReadings',
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                    CreatedBy: createdBy,
+                    ProviderId: providerId,
+                    ReadingDateTime: readingDateTime
+                },
+                success: function(response) {
+                    if (response.assetRoutes && response.tripRoutes) {
+                        populateTable(response.assetRoutes, '#assetRoutesTable', true);
+                        populateTable(response.tripRoutes, '#tripRoutesTable', false);
+                        calculateTotals(response.assetRoutes, response.tripRoutes);
+                    } else {
+                        console.error('Unexpected response format:', response);
+                        alert('Error fetching data, check console for details.');
+                    }
+                },
+                error: function(error) {
+                    console.error('Error fetching data:', error);
+                    alert('Error fetching data, check console for details.');
+                }
+            });
+        }
+
+        function populateTable(data, tableSelector, isAssetRoute) {
+            const tableBody = $(tableSelector).find('tbody');
+            tableBody.empty();  // Clear existing table data
+
+            data.forEach(item => {
+                let rowHtml;
+                if (isAssetRoute) {
+                    rowHtml = `<tr>
+                        <td>${item.route}</td>
+                        <td>${item.distanceMiles}</td>
+                        <td>${item.distanceKilometers}</td>
+                        <td>${item.duration}</td>
+                        <td>${item.startAddress}</td>
+                        <td>${item.endAddress}</td>
+                    </tr>`;
+                } else {
+                    rowHtml = `<tr>
+                        <td>${item.route}</td>
+                        <td>${item.sourceAddress}</td>
+                        <td>${item.destinationAddress}</td>
+                        <td>${item.distanceMiles}</td>
+                        <td>${item.distanceKilometers}</td>
+                        <td>${item.duration}</td>
+                    </tr>`;
+                }
+                tableBody.append(rowHtml);
+            });
+        }
+
+        function parseDuration(durationStr) {
+    let totalMinutes = 0;
+
+    const hourMatch = durationStr.match(/(\d+)\s*h/i);
+    const minMatch = durationStr.match(/(\d+)\s*min/i);
+
+    if (hourMatch) {
+        totalMinutes += parseInt(hourMatch[1], 10) * 60;  // Convert hours to minutes
+    }
+    if (minMatch) {
+        totalMinutes += parseInt(minMatch[1], 10);  // Add minutes directly
+    }
+    
+    return totalMinutes;
+}
+
+function calculateTotals(assetRoutes, tripRoutes) {
+    // Calculate totals for asset routes
+    const assetTotals = assetRoutes.reduce((totals, route) => {
+        totals.distanceMiles += parseFloat(route.distanceMiles);
+        totals.distanceKilometers += parseFloat(route.distanceKilometers);
+        totals.durationMinutes += parseDuration(route.duration);
+
+        return totals;
+    }, { distanceMiles: 0, distanceKilometers: 0, durationMinutes: 0 });
+
+    // Convert total asset duration to hours and minutes
+    const assetHours = Math.floor(assetTotals.durationMinutes / 60);
+    const assetMinutes = assetTotals.durationMinutes % 60;
+
+    // Update asset totals in the UI
+    $('#totalAssetDistanceMiles').text(assetTotals.distanceMiles.toFixed(2));
+    $('#totalAssetDistanceKilometers').text(assetTotals.distanceKilometers.toFixed(2));
+    $('#totalAssetDuration').text(`${assetHours}h ${assetMinutes}m`);
+
+    // Calculate totals for trip routes
+    const tripTotals = tripRoutes.reduce((totals, route) => {
+        totals.distanceMiles += parseFloat(route.distanceMiles);
+        totals.distanceKilometers += parseFloat(route.distanceKilometers);
+        totals.durationMinutes += parseDuration(route.duration);
+
+        return totals;
+    }, { distanceMiles: 0, distanceKilometers: 0, durationMinutes: 0 });
+
+    // Convert total trip duration to hours and minutes
+    const tripHours = Math.floor(tripTotals.durationMinutes / 60);
+    const tripMinutes = tripTotals.durationMinutes % 60;
+
+    // Update trip totals in the UI  
+    $('#totalTripDistanceMiles').text(tripTotals.distanceMiles.toFixed(2));
+    $('#totalTripDistanceKilometers').text(tripTotals.distanceKilometers.toFixed(2));
+    $('#totalTripDuration').text(`${tripHours}h ${tripMinutes}m`);
+}    </script>
+</body>
+</html>
+
+<%- include ('footer_list.html') %>
