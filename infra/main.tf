@@ -122,11 +122,12 @@ resource "aws_ecs_service" "app" {
   task_definition = aws_ecs_task_definition.app.arn
   desired_count   = var.desired_count
   launch_type     = "FARGATE"
+  health_check_grace_period_seconds = 0
 
   network_configuration {
     subnets         = var.private_subnets
     security_groups = [aws_security_group.task.id]
-    assign_public_ip = true
+    assign_public_ip = false
   }
 
   load_balancer {
